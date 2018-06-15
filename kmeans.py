@@ -7,8 +7,6 @@ import numpy as np
 
 
 
-
-
 class PafKmeans(object):
     def __init__(self, dataframe):
         self.dataframe = dataframe
@@ -23,11 +21,7 @@ class PafKmeans(object):
             sse.append(0)
             self.number = clusters_number
             self.kmeans()
-            for cluster in range(clusters_number):
-                mean = self.model.cluster_centers_[cluster]
-                for k, row in self.dataframe[self.dataframe["category"] == cluster].iterrows():
-                    
-                    sse[clusters_number-1] += (row - mean)**2            
+            sse[clusters_number-1] += self.model.inertia_           
         return sse
     def newDataFrame(self):
         self.dataframe['category'] = pd.Series(self.model.labels_, index = self.dataframe.index)
@@ -50,5 +44,5 @@ sse = pafkmeans.sseTab()
 plt.plot(np.arange(1, 10), sse, 'ro')
 plt.show()
 
-print(sse)
+
 

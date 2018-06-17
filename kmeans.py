@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn import metrics
 
 class PafKmeans(object):
     """ class with attributs a KMeans objects 
@@ -59,8 +60,6 @@ class PafKmeans(object):
 
 
 test = pd.read_csv("fruits.csv")
-test.index = test["fruit"]
-del test["fruit"]
 
 pafkmeans = PafKmeans(test)
 
@@ -81,6 +80,9 @@ plt.scatter(data.teinte,data.fibres,c=colormap[pafkmeans.model.labels_],s=40)
 plt.title('Classification K-means ')
 plt.show()
 
+plt.scatter(data.teinte,data.longueur,c=colormap[pafkmeans.model.labels_],s=40)
+plt.show()
+
 #cluster en 3D
 fig=plt.figure(1,figsize=(4,3))
 ax=Axes3D(fig,rect=[0,0,0.95,1],elev=48,azim=134)
@@ -91,8 +93,16 @@ ax.w_yaxis.set_ticklabels([])
 ax.w_zaxis.set_ticklabels([])
 
 ax.dist = 12
+plt.show()
 
 
+""" Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
+res=np.arange(9,dtype='double')
+for k in np.arange(2,9):
+    km=KMeans(n_clusters=k)
+    km.fit(test)
+    res[k]=metrics.silhouette_score(test,km.labels_)
+        
 
-
-
+plt.plot(np.arange(2, 11,1), res, 'ro')
+plt.show()

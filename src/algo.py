@@ -10,14 +10,17 @@ import math as m
 def clean_kmeans(data, centers):
     nb_clusters = len(centers)
     centers=np.array(centers)
-    #get clusters from data
-    clusters = [pd.DataFrame([d for _,d in data.iterrows() if d["category"] == i], columns=data.columns) for i in range(nb_clusters)]
-    
-    #removes the cluster feature from the dataset
-    for c in clusters:
-        del(c["category"])
 
-    #clean clusters by selecting the 20% points of the cluster nearest to the center
+    # get clusters from data
+    clusters=[]
+    for i in range(nb_clusters):
+        clusters.append(data.loc[data['category']==i]) # for each cluster, selects the points in the cluster
+
+     # removes the cluster feature from the dataset
+     for c in clusters:
+         del(c["category"])
+
+    # clean clusters by selecting the 20% points of the cluster nearest to the center
     clean_clusters = []
     for i in range(nb_clusters):
         srt_data = sorted(clusters[i].values, key = lambda x:sum((x-centers[i])**2))

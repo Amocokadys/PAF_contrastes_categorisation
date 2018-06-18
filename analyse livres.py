@@ -9,12 +9,47 @@ from os import listdir
 import csv
 import math
 import pandas
-import numpy
 
-mots = ["amour", "guerre", "homme", "femme", "courage"\
-		, "argent", "dieu", "arme", "oeuvre"]
+def remplir_dico(dico):
+	with open("jeux de donne/dictionnaire", "r", encoding="utf-8") as fichier:
+		cursor = csv.reader(fichier, delimiter=";")
+		for el in cursor:
+			dico.add(el[0])
 
-mots.sort()
+class Iter_bouquin:
+	
+	def __init__(self, fichier):
+		fich = open("livres/" + fichier, "r")
+		self.bouquin = fich.read() + " "
+		fich.close()
+		
+		self.dictionnaire = set()
+		remplir_dico(self.dictionnaire)
+		
+		for i in range(len(self.bouquin)):
+			if self.bouquin[i].lower() in "abcdefghijklmnopqrstuvwxyzéèàçùêâ-":
+				self.i_début = i
+				break
+	
+	def __iter__(self):
+		return self
+	
+	def __next__(self):
+		compteur = 0
+		for i in range(self.i_début, len(self.bouquin)):
+			if self.bouquin[i].lower() in "abcdefghijklmnopqrstuvwxyzéèàçùêâ-":
+				compteur += 1
+				if compteur == 1:
+					début = i
+			elif compteur > 1:
+				if self.bouquin[début:i].lower() in self.dictionnaire:
+					self.i_début = i
+					return self.bouquin[début:i].lower()
+				else:
+					compteur = 0
+			else:
+				compteur = 0
+		raise StopIteration
 
 class Tf_idf:
 	
@@ -22,16 +57,12 @@ class Tf_idf:
 	
 	def __init__(self):
 		self.dictionnaire = set()
+		remplir_dico(self.dictionnaire)
 		self.idf = []
-		with open("dictionnaire", "r", encoding="utf-8") as fichier:
-			cursor = csv.reader(fichier, delimiter=";")
-			for el in cursor:
-				self.dictionnaire.add(el[0])
+		
 	
 
 	def insertion(self, el):
-		if not el in self.dictionnaire:
-			return
 		a = -1
 		b = len(self.idf)
 		while a + 1 < b:
@@ -48,16 +79,9 @@ class Tf_idf:
 	def ajout_bouquin(self, livre):
 		self.nombre_bouquins += 1
 		
-		temp = open("livres/"+livre, "r", encoding="utf-8")
-		bouquin = temp.read() + " "
-		temp.close()
-		
-		i_début = -1
-		for i in range(len(bouquin)):
-			if not bouquin[i].lower() in "abcdefghijklmnopqrstuvwxyzéèàçùêâ-":
-				if i - i_début > 1:
-					self.insertion(bouquin[i_début+1:i].lower())
-				i_début = i
+		bouquin = Iter_bouquin(livre)
+		for mot in bouquin:
+			self.insertion(mot)
 		for mots in self.idf :
 			if mots[3] != 0:
 				mots[1] += mots[3]
@@ -85,10 +109,10 @@ def mots_pertinents(nombre):
 			meilleurs[meilleurs.index(min(meilleurs, key=lambda x:x[1]))] = (mots[0],toto)
 			minimum = min(meilleurs, key = lambda x:x[1])[1]
 		
-	return meilleurs
+	return meilleurs.sort(key=lambda x:-x[1])
 
 def livre2csv():
-	with open("données_livres.csv","w",encoding="utf-8") as fichier:
+	with open("jeux de donne/bibliothq.csv","w",encoding="utf-8") as fichier:
 		curseur = csv.writer(fichier, delimiter=",", quotechar="\"")
 		curseur.writerow(["livres"] + mots)
 		for livre in listdir("./livres/"):

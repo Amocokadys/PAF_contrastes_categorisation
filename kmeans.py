@@ -38,8 +38,8 @@ class PafKmeans:
     
     def findN(self):
         """ finds the ideal k through the silhouette metric : https://en.wikipedia.org/wiki/Silhouette_(clustering) """        
-        res=np.arange(9,dtype='double')
-        for k in np.arange(2,11):
+        res=np.arange(20,dtype='double')
+        for k in np.arange(2,22):
             self.kmeans(k)
             res[k-2]=metrics.silhouette_score(self.dataframe,self.model.labels_)   
         self.number=np.argmax(res[2:])+4 #first values not pertinent
@@ -58,19 +58,20 @@ class PafKmeans:
     
 
 
-test = pd.read_csv("fruitsModified2.csv")
+test = pd.read_csv("fruitsModified.csv")
 del test["Unnamed: 0"]
+print(test)
 pafkmeans = PafKmeans(test)
 centers, data = pafkmeans.result()
 
 #Visualisation des clusters formés par K-Means
-plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+plt.scatter(data.r,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
 plt.title('Classification K-means ')
 plt.xlabel("teintes")
 plt.ylabel("fibres")
 plt.show()
 
-plt.scatter(data.teinte,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+plt.scatter(data.r,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
 plt.xlabel("teintes")
 plt.ylabel("longueur")
 plt.show()
@@ -78,7 +79,7 @@ plt.show()
 #cluster en 3D
 fig=plt.figure(1,figsize=(4,3))
 ax=Axes3D(fig,rect=[0,0,0.95,1],elev=48,azim=134)
-ax.scatter(data.teinte, data.fibres, data.longueur,c=pafkmeans.model.labels_.astype(np.float), edgecolor='k')
+ax.scatter(data.r, data.v, data.b,c=pafkmeans.model.labels_.astype(np.float), edgecolor='k')
 
 ax.w_xaxis.set_ticklabels([])
 ax.w_yaxis.set_ticklabels([])
@@ -94,7 +95,7 @@ plt.show()
 res=pafkmeans.silhouette
 print("res = ",res)
 print("k =",pafkmeans.number)
-plt.plot(np.arange(2, 11,1), res, 'ro')
+plt.plot(np.arange(2, 22,1), res, 'ro')
 plt.xlabel("k")
 plt.ylabel("Score sur 1")
 plt.show()

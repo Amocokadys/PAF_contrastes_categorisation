@@ -9,18 +9,19 @@ function nettoyer_texte() {
 	if [ -n "`grep 'édition électronique' "$1"`" ]
 	then
 		echo "$1 -> suppression du message de fin"
-		sed -i "`grep -n 'édition électronique' "$1"  | tail -n1 | sed 's/\([0-9]*\):.*/\1/'`,$ d" "$1"
+		sed -i "`grep -n 'édition électronique' "$1"  | tail -n1 | sed 's/^\([0-9]*\):.*/\1/'`,$ d" "$1"
 	fi
 	if [ -n "`grep 'CHAPITRE PREMIER' "$1"`" ]
 	then
 		echo "$1 -> suppression du sommaire"
-		sed -i "0,`grep -n 'CHAPITRE PREMIER' "$1"  | tail -n1 | sed 's/\([0-9]*\):.*/\1/'` d" "$1"
+		sed -i "1,`grep -n 'CHAPITRE PREMIER' "$1"  | tail -n1 | sed 's/^\([0-9]*\):.*/\1/'` d" "$1"
 	fi
 	if [ -n "`grep 'PREMIÈRE PARTIE' "$1"`" ]
 	then
 		echo "$1 -> suppression du sommaire"
-		sed -i "0,`grep -n 'PREMIÈRE PARTIE' "$1"  | tail -n1 | sed 's/\([0-9]*\):.*/\1/'` d" "$1"
+		sed -i "1,`grep -n 'PREMIÈRE PARTIE' "$1"  | tail -n1 | sed 's/^\([0-9]*\):.*/\1/'` d" "$1"
 	fi
+	sed -i '/CHAPITRE/ d' "$1"
 }
 
 for livre in $liste_bureautique

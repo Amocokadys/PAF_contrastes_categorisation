@@ -18,6 +18,7 @@ class PafKmeans(object):
         self.dataframe = dataframe
         self.model = None
         self.number = 4
+        self.silhouette=None
         
     def kmeans(self, number):
         """ execute kmeans for n_clusters=numbe r"""
@@ -35,11 +36,12 @@ class PafKmeans(object):
     
     def findN(self):
         """ finds the ideal k through the silhouette metric """        
-        res=np.arange(7,dtype='double')
-        for k in np.arange(2,9):
+        res=np.arange(9,dtype='double')
+        for k in np.arange(2,11):
             self.kmeans(k)
-            res[k-2]=metrics.silhouette_score(self.dataframe,self.model.labels_)            
-        self.number=np.argmax(res)+2
+            res[k-2]=metrics.silhouette_score(self.dataframe,self.model.labels_)   
+        self.number=np.argmax(res[2:])+4 #first values not pertinent
+        self.silhouette=res
         
     def newDataFrame(self):
         """ adds the column category in the dataframe with the labels of the clusters """
@@ -54,23 +56,19 @@ class PafKmeans(object):
     
 
 
-test = pd.read_csv("fruitsModified.csv")
+test = pd.read_csv("fruitsModified2.csv")
 del test["Unnamed: 0"]
 pafkmeans = PafKmeans(test)
+centers, data = pafkmeans.result()
 
 # La courbe en "coude"
-centers, data = pafkmeans.result()
+"""
 sse = pafkmeans.sseTab()
 plt.plot(np.arange(1, 10), sse, 'ro')
 plt.xlabel("k")
 plt.ylabel("Distorsion")
 plt.show()
-
-
-print("k = " + str(pafkmeans.number))
-print(pafkmeans.result())
-
-colormap=np.array(['Red','green','blue'])
+"""
 
 #Visualisation des clusters formés par K-Means
 plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
@@ -98,14 +96,9 @@ plt.show()
 
 
 """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
-
-res2=np.arange(7,dtype='double')
-for k in np.arange(2,9):
-    km=KMeans(n_clusters=k)
-    km.fit(test)
-    res2[k-2]=(metrics.silhouette_score(test,km.labels_))
-        
-plt.plot(np.arange(2, 9,1), res2, 'ro')
+res=pafkmeans.silhouette
+print("res = ",res)
+plt.plot(np.arange(2, 11,1), res, 'ro')
 plt.xlabel("k")
 plt.ylabel("Score sur 1")
 plt.show()

@@ -1,5 +1,7 @@
 #!/usr/bin/python3.6
 
+import Cluster
+
 import sys
 import pandas as pd
 import numpy as np
@@ -16,9 +18,9 @@ def clean_kmeans(data, centers):
     for i in range(nb_clusters):
         clusters.append(data.loc[data['category']==i]) # for each cluster, selects the points in the cluster
 
-     # removes the cluster feature from the dataset
-     for c in clusters:
-         del(c["category"])
+    # removes the cluster feature from the dataset
+    for c in clusters:
+        del(c["category"])
 
     # clean clusters by selecting the 20% points of the cluster nearest to the center
     clean_clusters = []

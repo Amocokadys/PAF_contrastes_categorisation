@@ -34,27 +34,12 @@ class PafKmeans(object):
         return sse
     
     def findN(self):
-        """ finds the ideal k through the silhouette metric """
-        """ finds the ideal k through the elbow method 
-        sse = self.sseTab()
-        pentes = []
-        for i in range(1, len(sse)):
-            pentes.append(sse[i] - sse[i-1])
-        k = -1
-        pourcentage = 100
-        while k < len(pentes)-1 and pourcentage > 10:
-            k+=1
-            pourcentage = abs(pentes[k] / sse[0]) * 100
-        self.number = k+1 """
-        
-        res=np.arange(9,dtype='double')
+        """ finds the ideal k through the silhouette metric """        
+        res=np.arange(7,dtype='double')
         for k in np.arange(2,9):
             self.kmeans(k)
-            res[k]=metrics.silhouette_score(self.dataframe,self.model.labels_)
-            
-        self.number=np.argmax(res) +2
-    
-    
+            res[k-2]=metrics.silhouette_score(self.dataframe,self.model.labels_)            
+        self.number=np.argmax(res)+2
         
     def newDataFrame(self):
         """ adds the column category in the dataframe with the labels of the clusters """
@@ -69,14 +54,16 @@ class PafKmeans(object):
     
 
 
-test = pd.read_csv("fruits.csv")
-
+test = pd.read_csv("fruitsModified.csv")
+del test["Unnamed: 0"]
 pafkmeans = PafKmeans(test)
 
 # La courbe en "coude"
 centers, data = pafkmeans.result()
 sse = pafkmeans.sseTab()
 plt.plot(np.arange(1, 10), sse, 'ro')
+plt.xlabel("k")
+plt.ylabel("Distorsion")
 plt.show()
 
 
@@ -86,11 +73,15 @@ print(pafkmeans.result())
 colormap=np.array(['Red','green','blue'])
 
 #Visualisation des clusters formés par K-Means
-plt.scatter(data.teinte,data.fibres,c=colormap[pafkmeans.model.labels_],s=40)
+plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
 plt.title('Classification K-means ')
+plt.xlabel("teintes")
+plt.ylabel("fibres")
 plt.show()
 
-plt.scatter(data.teinte,data.longueur,c=colormap[pafkmeans.model.labels_],s=40)
+plt.scatter(data.teinte,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+plt.xlabel("teintes")
+plt.ylabel("longueur")
 plt.show()
 
 #cluster en 3D
@@ -107,12 +98,14 @@ plt.show()
 
 
 """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
-res=np.arange(9,dtype='double')
+
+res2=np.arange(7,dtype='double')
 for k in np.arange(2,9):
     km=KMeans(n_clusters=k)
     km.fit(test)
-    res[k]=metrics.silhouette_score(test,km.labels_)
+    res2[k-2]=(metrics.silhouette_score(test,km.labels_))
         
-
-plt.plot(np.arange(2, 11,1), res, 'ro')
+plt.plot(np.arange(2, 9,1), res2, 'ro')
+plt.xlabel("k")
+plt.ylabel("Score sur 1")
 plt.show()

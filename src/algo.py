@@ -14,7 +14,7 @@ def clean_kmeans(data, centers):
     for i in range(nb_clusters):
         clusters.append(data.loc[data['category']==i]) # for each cluster, selects the points in the cluster
 
-    # removes the cluster feature from the dataset
+     # removes the cluster feature from the dataset
     for c in clusters:
         del(c["category"])
 

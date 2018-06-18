@@ -34,7 +34,8 @@ class PafKmeans(object):
         return sse
     
     def findN(self):
-        """ finds the ideal k through the elbow method """
+        """ finds the ideal k through the silhouette metric """
+        """ finds the ideal k through the elbow method 
         sse = self.sseTab()
         pentes = []
         for i in range(1, len(sse)):
@@ -44,7 +45,16 @@ class PafKmeans(object):
         while k < len(pentes)-1 and pourcentage > 10:
             k+=1
             pourcentage = abs(pentes[k] / sse[0]) * 100
-        self.number = k+1 
+        self.number = k+1 """
+        
+        res=np.arange(9,dtype='double')
+        for k in np.arange(2,9):
+            self.kmeans(k)
+            res[k]=metrics.silhouette_score(self.dataframe,self.model.labels_)
+            
+        self.number=np.argmax(res) +2
+    
+    
         
     def newDataFrame(self):
         """ adds the column category in the dataframe with the labels of the clusters """

@@ -12,6 +12,7 @@ def clusterPlusProche(listeCluster,listeCentre,point):
             distanceMin=distanceCourante
     return(plusProche)
     
+<<<<<<< HEAD
 def clusteriseAvecEcartsTypes(listeCluster,listeCentre,listePointsRestants):
     listeObjetsCluster=[]
     for k in range(len(listeCluster)):

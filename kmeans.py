@@ -93,7 +93,7 @@ plt.show()
 """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
 res=pafkmeans.silhouette
 print("res = ",res)
-print("k =" + k)
+print("k =",pafkmeans.number)
 plt.plot(np.arange(2, 11,1), res, 'ro')
 plt.xlabel("k")
 plt.ylabel("Score sur 1")

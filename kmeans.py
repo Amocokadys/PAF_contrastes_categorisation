@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+#
+# Telecom ParisTech : https://www.telecom-paristech.fr
+# Projet PAF - 2018 : https://paf.telecom-paristech.fr
+#
+# Antoine Bellami
+# Aurelien Blicq
+# Clement Bonet
+# Benoit Malezieux
+# Louis Penet de Monterno
+# Bastien Vagne
+
 
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -8,7 +19,7 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn import metrics
 
-class PafKmeans(object):
+class PafKmeans:
     """ class with attributs a KMeans objects 
         the dataframe on which we use kmean
         the number of clusters we want
@@ -24,18 +35,9 @@ class PafKmeans(object):
         """ execute kmeans for n_clusters=numbe r"""
         self.model = KMeans(n_clusters = number)
         self.model.fit(self.dataframe)
-        
-    def sseTab(self):
-        """ return the distorsion in all clusters """
-        sse = []
-        for clusters_number in range(1, 10):
-            sse.append(0)
-            self.kmeans(clusters_number)
-            sse[clusters_number-1] += self.model.inertia_           
-        return sse
     
     def findN(self):
-        """ finds the ideal k through the silhouette metric """        
+        """ finds the ideal k through the silhouette metric : https://en.wikipedia.org/wiki/Silhouette_(clustering) """        
         res=np.arange(9,dtype='double')
         for k in np.arange(2,11):
             self.kmeans(k)
@@ -61,15 +63,6 @@ del test["Unnamed: 0"]
 pafkmeans = PafKmeans(test)
 centers, data = pafkmeans.result()
 
-# La courbe en "coude"
-"""
-sse = pafkmeans.sseTab()
-plt.plot(np.arange(1, 10), sse, 'ro')
-plt.xlabel("k")
-plt.ylabel("Distorsion")
-plt.show()
-"""
-
 #Visualisation des clusters formés par K-Means
 plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
 plt.title('Classification K-means ')
@@ -91,6 +84,8 @@ ax.w_xaxis.set_ticklabels([])
 ax.w_yaxis.set_ticklabels([])
 ax.w_zaxis.set_ticklabels([])
 
+plt.title("Classification k-mean 3D")
+
 ax.dist = 12
 plt.show()
 
@@ -98,6 +93,7 @@ plt.show()
 """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
 res=pafkmeans.silhouette
 print("res = ",res)
+print("k =" + k)
 plt.plot(np.arange(2, 11,1), res, 'ro')
 plt.xlabel("k")
 plt.ylabel("Score sur 1")

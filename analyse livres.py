@@ -6,89 +6,86 @@ Ceci est un script temporaire.
 """
 
 from os import listdir
-from os.path import isfile, join
 import csv
 import math
 import pandas
+import numpy
 
 mots = ["amour", "guerre", "homme", "femme", "courage"\
 		, "argent", "dieu", "arme", "oeuvre"]
 
 mots.sort()
 
-class tf_idf:
+class Tf_idf:
 	
 	nombre_bouquins = 0
 	
 	def __init__(self):
 		self.dictionnaire = set()
+		self.idf = []
 		with open("dictionnaire", "r", encoding="utf-8") as fichier:
-			cursor = csv.reader(fichier, separator=",")
+			cursor = csv.reader(fichier, delimiter=";")
 			for el in cursor:
-				dictionnaire.add(el[0])
+				self.dictionnaire.add(el[0])
 	
 
-	def insertion(self,liste, el):
+	def insertion(self, el):
 		if not el in self.dictionnaire:
 			return
 		a = -1
-		b = len(liste)
+		b = len(self.idf)
 		while a + 1 < b:
-			temp = liste[(a+b)//2][0]
+			temp = self.idf[(a+b)//2][0]
 			if temp < el:
 				a = (a+b)//2
 			elif temp > el:
 				b = (a+b)//2
 			else:
-				liste[(a+b)//2][3] += 1
+				self.idf[(a+b)//2][3] += 1
 				return
-		liste.insert(b,[el,0,0,1])
+		self.idf.insert(b,[el,0,0,1])
 	
 	def ajout_bouquin(self, livre):
 		self.nombre_bouquins += 1
 		
 		temp = open("livres/"+livre, "r", encoding="utf-8")
-		bouquin = temp.read()
+		bouquin = temp.read() + " "
 		temp.close()
 		
-		ensemble_mots = []
-		
-		i_début = 0
+		i_début = -1
 		for i in range(len(bouquin)):
 			if not bouquin[i].lower() in "abcdefghijklmnopqrstuvwxyzéèàçùêâ-":
 				if i - i_début > 1:
-					ensemble_mots.append(bouquin[i_début:i].lower())
-					i_début = i
-				
-		for mot in ensemble_mots:
-			self.insertion(idf,mot.lower())
-	
-	def mots_pertinents(nombre):
-	
-		with open("données_livres.csv","w",encoding="utf-8") as fichier:
-			idf = []
-			for livre in listdir("./livres/"):
-				
-				
-				
-				for mots in idf :
-					if mots[3] != 0:
-						mots[1] += mots[3]
-						mots[2] += 1
-						mots[3] = 0
-		for mots in idf:
-			mots[1] = math.log(nombre_de_bouquins / mots[2])
-		idf.sort(key=lambda x:-x[1])
-		return idf[:nombre]
+					self.insertion(bouquin[i_début+1:i].lower())
+				i_début = i
+		for mots in self.idf :
+			if mots[3] != 0:
+				mots[1] += mots[3]
+				mots[2] += 1
+				mots[3] = 0
+	def __iter__(self):
+		return iter(self.idf)		
+			
+def mots_pertinents(nombre):
 
-def remplace_char_chelou():
-	for livre in listdir("./livres/"):			
-		temp = open("livres/"+livre, "r", encoding="utf-8")
-		bouquin = temp.read()
-		temp.close()
+
+	tfidf = Tf_idf()
+	for livre in listdir("./livres/"):
+		print("analyse de ",livre," ...")
+		tfidf.ajout_bouquin(livre)
+			
+	meilleurs = []
+	minimum = 0
+	for mots in tfidf:
+		toto = mots[1] * math.log(tfidf.nombre_bouquins / mots[2])
+		if len(meilleurs) < nombre:
+			meilleurs.append((mots[0],toto))
+			minimum = min(meilleurs, key = lambda x:x[1])[1]
+		elif toto > minimum:
+			meilleurs[meilleurs.index(min(meilleurs, key=lambda x:x[1]))] = (mots[0],toto)
+			minimum = min(meilleurs, key = lambda x:x[1])[1]
 		
-	
-		 
+	return meilleurs
 
 def livre2csv():
 	with open("données_livres.csv","w",encoding="utf-8") as fichier:

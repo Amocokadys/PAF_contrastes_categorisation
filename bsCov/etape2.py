@@ -1,50 +1,13 @@
 import pandas as pd
 import numpy as np
-
-#On calcul la matrice de covariance d'un ensemble de point
-#argument=dataframe correspondant à la liste des points d'un cluster (avec leur catégorie)
-#sortie=matrice de covariance du cluster sous forme d'array
-def matriceCovariance(dataframe):
-    dataSansCategorie=dataframe.copy()
-    del(dataSansCategorie['Categorie'])
-    nbColonne=len(dataSansCategorie.columns)
-    nbLigne=len(dataSansCategorie)
-    Esperances=dataSansCategorie.mean()
-    matrice=[]
-    for i in dataSansCategorie.columns:
-        ligneI=[]
-        for j in dataSansCategorie.columns:
-            covIJ=0
-            for k in range(nbLigne):
-                covIJ+=(dataSansCategorie[i][k]-Esperances[i])*(dataSansCategorie[j][k]-Esperances[j])
-            covIJ=covIJ/nbLigne
-            ligneI.append(covIJ)
-        matrice.append(ligneI)
-    return(np.array(matrice))
-    
-
-#fonction qui calcule la distance d'un point à un cluster en nombre d'ecarts types    
-#arguments=cluster : objet contenant une dataframe de la liste de ses points, point : arraylist contenant uniquement les coordonnées du point
-#sortie=float distance du point au cluster
-def distance(cluster,point):
-    #matriceInverse=np.linalg.inv.matriceCovariance(cluster.dataframe) 
-     #TODO remplacer par l'expression exacte
-    matriceInverse=np.linalg.inv(matriceCovariance(cluster))
-    vect=np.dot(matriceInverse,point)
-    norme=0
-    for x in vect:
-        norme+=x*x
-    norme=np.sqrt(norme)
-    return(norme)
-    
     
 #associe un point à au cluster duquel il est le plus proche en nombre d'ecarts types
-def clusterPlusProche(nbCluster,dataframe,point):
+def clusterPlusProche(listeCluster,listecentre,point):
     plusProche=0
     distanceMin=1  #distance=1/(1+distance) en fait pour éviter d'avoir des infinis
-    for k in range(nbCluster):
-        clusterk#TODO
-        distanceCourante=1/(1+distance(clusterk,point))
+    for k in range(len(centre)):
+        clusterk=Cluster(listeCluster[k],centre[k],k)
+        distanceCourante=1/(1+clusterk.distance(point))
         if distanceCourante<distanceMin:
             plusProche=k
             distanceMin=distanceCourante

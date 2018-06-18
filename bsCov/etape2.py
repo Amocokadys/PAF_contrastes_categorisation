@@ -39,9 +39,16 @@ def distance(cluster,point):
     
     
 #associe un point à au cluster duquel il est le plus proche en nombre d'ecarts types
-def clusterPlusProche(dataframe,point):
-    #TODO
-    return()
+def clusterPlusProche(nbCluster,dataframe,point):
+    plusProche=0
+    distanceMin=1  #distance=1/(1+distance) en fait pour éviter d'avoir des infinis
+    for k in range(nbCluster):
+        clusterk#TODO
+        distanceCourante=1/(1+distance(clusterk,point))
+        if distanceCourante<distanceMin:
+            plusProche=k
+            distanceMin=distanceCourante
+    return(plusProche)
     
     
 """test:

@@ -25,6 +25,7 @@ def calcDiffs(cluster):
 def traitement(data):
     pafKmeans=kmeans.PafKmeans(data)
     centres, clusters=pafKmeans.result()
+    print (clusters)
     return clean.clean_kmeans(clusters, centres)
 
 def contrast(data):

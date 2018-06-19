@@ -11,6 +11,7 @@ Description du fichier …… : Cartouche
 """
 
 
+
 import numpy as np
 import pandas as pd
 
@@ -79,8 +80,7 @@ categorisation = pafgmm.result()
 
 contraste = Contraste(categorisation, pafgmm.model.means_, 10).calcul()
 
-print(categorisation)
-print(contraste)
-
+print(categorisation.sort_values(by = "category"))
+print(contraste.sort_values(by = "category"))
 
 

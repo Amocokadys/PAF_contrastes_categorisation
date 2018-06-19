@@ -47,8 +47,7 @@ class Cluster:
     """
     def distance(self,point):
         """function that calculates the distance between the argument point and the cluster"""
-        valeursPropres,passage=eig(self.matriceCov)
-        print(passage)
+        valeursPropres,passage=np.linalg.eig(self.matriceCov)
         point=np.dot(passage,(point-self.centre))
         somme=0
         for sigma in valeursPropres:
@@ -74,5 +73,5 @@ class Cluster:
         with standard deviation normalisation
     """
     def ajouterPoint(self,point):
-        new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(points), stop=len(points+1), step=1))
+        new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(self.points), stop=len(self.points)+1, step=1))
         self.points = self.points.append(new_data)

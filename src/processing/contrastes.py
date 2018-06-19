@@ -35,6 +35,17 @@ def contrast(data):
         contrast_data = contrast_data.append(diffs)
     return processed_data, traitement(contrast_data)
 
+def graphicsClusters(data):
+    clusterList=traitement(data)
+    for k in clusterList:
+        plt.scatter(k.points.longueur,k.points.fibres)
+        plt.title('Classification K-means ')
+        plt.xlabel("longueur")
+        plt.ylabel("fibres")
+        plt.show()
+        print(k.points.index)
+        
+
 if __name__ == "__main__":
     #test of the function
     """
@@ -42,12 +53,16 @@ if __name__ == "__main__":
                                [5, -5, 8], [4, -4, 0.05], [7, -4, 0.6], [4, -7, 2], [7, -7, 0]]),\
                      columns = ['x', 'y', 'z'])
     c = cluster.Cluster(d, np.array([0, 0, 0.3]), 0)
-    print(calcDiffs(c)) """
+    print(calcDiffs(c)) 
     
-    data = pd.read_csv("../../fruitsModified.csv")
-    del data["Unnamed: 0"]
+
     clst, crst_clst = contrast(data)
     print(*[cl.points for cl in clst], sep = '\n')
     print(*[cl.points for cl in crst_clst], sep = '\n')
-
+    """
     """ TODO : affichage """
+    
+    data = pd.read_csv("../../fruitsModified.csv")
+    del data["Unnamed: 0"]
+
+    graphicsClusters(data)    

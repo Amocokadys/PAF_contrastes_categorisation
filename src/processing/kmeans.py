@@ -104,14 +104,14 @@ def graphic_elbow(pafkmeans,title):
 def graphic_clusters_fruits(pafkmeans):
     #Visualisation des clusters formés par K-Means
     centers,data=pafkmeans.result()
-    plt.scatter(data.r,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+    plt.scatter(data.longueur,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
     plt.title('Classification K-means ')
-    plt.xlabel("teintes")
+    plt.xlabel("longueur")
     plt.ylabel("fibres")
     plt.show()
     
     plt.scatter(data.r,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
-    plt.xlabel("teintes")
+    plt.xlabel("rouge")
     plt.ylabel("longueur")
     plt.show()
     

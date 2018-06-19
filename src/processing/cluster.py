@@ -46,12 +46,28 @@ class Cluster:
         the output is a float representing the distance
     """
     def distance(self,point):
-        matriceInverse = np.linalg.inv(self.matriceCov)
-        vect = np.dot(matriceInverse,point)
-        norme = 0
+        """function that calculates the distance between the argument point and the cluster"""
+        valeursPropres,passage=eig(self.matriceCov)
+        print(passage)
+        point=np.dot(passage,point)
+        somme=0
+        for sigma in valeursPropres:
+            if (sigma != 0):
+                somme+=(1/sigma**2)
+        n=len(valeursPropres)
+        for k in range(n):              #the diagonal matrix is being inversed, together with the replacement of the '1/0' by somme
+            if (valeursPropres[k]==0):
+                valeursPropres[k]=somme
+            else:
+                valeursPropres[k]=1/valeursPropres[k]
+        diagonale=np.zeros((n,n))
+        for k in range(n):
+            diagonale[k][k]=valeursPropres[k]
+        vect=np.dot(diagonale,point)
+        norme=0
         for x in vect:
-            norme += x*x
-        norme = np.sqrt(norme)
+            norme+=x*x
+        norme=np.sqrt(norme)
         return(norme)
         
     """ function to add points to a cluster when rebuilding it

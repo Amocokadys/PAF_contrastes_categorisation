@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-# Telecom ParisTech : https://www.telecom-paristech.fr
-# Projet PAF - 2018 : https://paf.telecom-paristech.fr
-#
-# Antoine Bellami
-# Aurelien Blicq
-# Clement Bonet
-# Benoit Malezieux
-# Louis Penet de Monterno
-# Bastien Vagne
 
+"""
+Organisme de référence …… : Télécom ParisTech (https://www.telecom-paristech.fr/)
+Contexte du projet ……………… : Projet PAF (https://paf.telecom-paristech.fr/)
+Sujet ………………………………………………… : Contraste et catégorisation (http://teaching.dessalles.fr/Projects/P18051801.html)
+Auteurs …………………………………………… : Bastien Vagne, Louis Penet de Monterno, Benoît Malézieux,Clément Bonet, Aurélien Blicq, Antoine Bellami
+Date …………………………………………………… : 19/06/2018
+Description du fichier …… : Cartouche
+"""
 
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -17,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
-from sklearn import metrics
+#from sklearn import metrics
 
 class PafKmeans:
     """ class with attributs a KMeans objects 
@@ -29,21 +28,35 @@ class PafKmeans:
         self.dataframe = dataframe
         self.model = None
         self.number = 4
-        self.silhouette=None
         
     def kmeans(self, number):
         """ execute kmeans for n_clusters=numbe r"""
         self.model = KMeans(n_clusters = number)
         self.model.fit(self.dataframe)
-    
-    def findN(self):
-        """ finds the ideal k through the silhouette metric : https://en.wikipedia.org/wiki/Silhouette_(clustering) """        
-        res=np.arange(20,dtype='double')
-        for k in np.arange(2,22):
-            self.kmeans(k)
-            res[k-2]=metrics.silhouette_score(self.dataframe,self.model.labels_)   
-        self.number=np.argmax(res[2:])+4 #first values not pertinent
-        self.silhouette=res
+        
+    def sseTab(self):
+        """ return the distorsion in all clusters, distorsion = mean distance with cluster's center """
+        sse = []
+        for clusters_number in range(1, 30):
+            sse.append(0)
+            self.kmeans(clusters_number)
+            sse[clusters_number-1] += self.model.inertia_           
+        return sse
+        
+    def findElbow(self):
+        """ method to find k through the elbow method with slopes"""
+        sse = self.sseTab()
+        pentes = []
+        for i in range(1, len(sse)):
+            pentes.append(sse[i] - sse[i-1])
+            
+        k=1
+        ang=180
+        while(k<len(pentes)-1 and (abs(180-ang*180/np.pi)>110)):
+            ang=abs(np.arctan(pentes[0])-np.arctan(pentes[k]))
+            k+=1
+            
+        self.number=k
         
     def newDataFrame(self):
         """ adds the column category in the dataframe with the labels of the clusters """
@@ -51,34 +64,58 @@ class PafKmeans:
         
     def result(self):
         """ return the coordinates of cluster's centers and the dataframe"""
-        self.findN()
+        self.findElbow()
         self.kmeans(self.number)
         self.newDataFrame()
         return self.model.cluster_centers_, self.dataframe
     
 
-if __name__=="__main__":
-    test = pd.read_csv("fruitsModified2.csv")
+def test_fruits():
+    test = pd.read_csv("../../fruitsModified.csv")
     del test["Unnamed: 0"]
-    pafkmeans = PafKmeans(test)
-    centers, data = pafkmeans.result()
+    pafkmeans=PafKmeans(test)
+    #centers,data = pafkmeans.result()
+    return pafkmeans
 
+def test_livres():
+    test=pd.read_csv("../../bibliothq.csv")
+    test.index=test["livres"]
+    del test["livres"]
+    pafkmeans = PafKmeans(test)
+    #centers, data = pafkmeans.result()
+    return pafkmeans
+
+def graphic_elbow(pafkmeans,title):
+    """ 
+        Trace the elbow curve
+        arg : Pafkmeans object    
+    """
+    centers, data = pafkmeans.result()
+    sse = pafkmeans.sseTab()
+    plt.plot(np.arange(1, 30), sse, 'ro')
+    plt.xlabel("k")
+    plt.ylabel("distorsion") #distorsion = Somme variance (distance avec centre cluster)
+    plt.title(title)
+    plt.show()
+
+def graphic_clusters_fruits(pafkmeans):
     #Visualisation des clusters formés par K-Means
-    plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+    centers,data=pafkmeans.result()
+    plt.scatter(data.r,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
     plt.title('Classification K-means ')
     plt.xlabel("teintes")
     plt.ylabel("fibres")
     plt.show()
-
-    plt.scatter(data.teinte,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+    
+    plt.scatter(data.r,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
     plt.xlabel("teintes")
     plt.ylabel("longueur")
     plt.show()
-
+    
     #cluster en 3D
     fig=plt.figure(1,figsize=(4,3))
     ax=Axes3D(fig,rect=[0,0,0.95,1],elev=48,azim=134)
-    ax.scatter(data.teinte, data.fibres, data.longueur,c=pafkmeans.model.labels_.astype(np.float), edgecolor='k')
+    ax.scatter(data.r, data.v, data.b,c=pafkmeans.model.labels_.astype(np.float), edgecolor='k')
 
     ax.w_xaxis.set_ticklabels([])
     ax.w_yaxis.set_ticklabels([])
@@ -89,11 +126,16 @@ if __name__=="__main__":
     ax.dist = 12
     plt.show()
 
-    """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
-    res=pafkmeans.silhouette
-    print("res = ",res)
-    print("k =",pafkmeans.number)
-    plt.plot(np.arange(2, 11,1), res, 'ro')
-    plt.xlabel("k")
-    plt.ylabel("Score sur 1")
-    plt.show()
+
+def main():
+    pafkmean_livres=test_livres()
+    pafkmean_fruits=test_fruits()
+    graphic_elbow(pafkmean_livres,"Elbow of books")
+    graphic_elbow(pafkmean_fruits,"Elbow of fruits")
+    graphic_clusters_fruits(pafkmean_fruits)
+    print("k_fruits = ",pafkmean_fruits.number)
+    print("k_books = ",pafkmean_livres.number)
+    
+if __name__ == "__main__":
+    main()
+

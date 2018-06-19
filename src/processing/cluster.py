@@ -49,7 +49,7 @@ class Cluster:
         """function that calculates the distance between the argument point and the cluster"""
         valeursPropres,passage=eig(self.matriceCov)
         print(passage)
-        point=np.dot(passage,point)
+        point=np.dot(passage,(point-self.centre))
         somme=0
         for sigma in valeursPropres:
             if (sigma != 0):

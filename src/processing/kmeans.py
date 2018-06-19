@@ -38,8 +38,8 @@ class PafKmeans:
     
     def findN(self):
         """ finds the ideal k through the silhouette metric : https://en.wikipedia.org/wiki/Silhouette_(clustering) """        
-        res=np.arange(9,dtype='double')
-        for k in np.arange(2,11):
+        res=np.arange(20,dtype='double')
+        for k in np.arange(2,22):
             self.kmeans(k)
             res[k-2]=metrics.silhouette_score(self.dataframe,self.model.labels_)   
         self.number=np.argmax(res[2:])+4 #first values not pertinent
@@ -88,7 +88,6 @@ if __name__=="__main__":
 
     ax.dist = 12
     plt.show()
-
 
     """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
     res=pafkmeans.silhouette

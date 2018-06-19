@@ -13,7 +13,7 @@ def clusterPlusProche(listeCluster,listeCentre,point):
     # instead of computing min(distance) it computes max(1/(1+distance))
     # it is to initialize the min dist to 0, and avoid problems with infinity
     plusProche=0
-    distanceMin=1 
+    distanceMin=0 
     for k in range(len(listeCentre)):
         distanceCourante=1/(1+listeCluster[k].distance(point))
         if distanceCourante>distanceMin:
@@ -34,7 +34,8 @@ def clusteriseAvecEcartsTypes(listeCluster,listeCentre,listePointsRestants):
     listePointsRestants=np.array(listePointsRestants)
     for point in listePointsRestants:
         plusProche=clusterPlusProche(listeObjetsCluster,listeCentre,point)
-        listeObjetsCluster[k].ajouterPoint(point)
+        listeObjetsCluster[plusProche].ajouterPoint(point)
+
     return(listeObjetsCluster)
 
 

@@ -64,7 +64,6 @@ class PafKmeans:
     def newDataFrame(self):
         """ adds the column category in the dataframe with the labels of the clusters """
         self.dataframe['category'] = pd.Series(self.model.labels_, index = self.dataframe.index)
-        #self.dataframe['nomDonnees'] = pd.Series(self.dataframe.index,index=self.dataframe.index)
         
     def result(self):
         """ return the coordinates of cluster's centers and the dataframe"""
@@ -170,31 +169,21 @@ def afficherChaqueCluster(pafkmean):
 def main():
     pafkmean_livres=test_livres()
     pafkmean_fruits=test_fruits()
-    """
+    
     
     graphic_elbow(pafkmean_livres,"Elbow of books")
     graphic_elbow(pafkmean_fruits,"Elbow of fruits")
+    """
     graphic_clusters_fruits(pafkmean_fruits)
     
     afficherDatasCategory(pafkmean_livres.dataframe)
     afficherDatasCategory(pafkmean_fruits.dataframe)
-    
-    afficherChaqueCluster(pafkmean_fruits)
     """
-    print(pafkmean_fruits.result()[1])
+    afficherChaqueCluster(pafkmean_fruits)
     
     print("k_fruits = ",pafkmean_fruits.number)
     print("k_books = ",pafkmean_livres.number)
     
 if __name__ == "__main__":
-    main()
-    """
-    gmm = GaussianMixture(n_components=2)
-    test=pd.read_csv("../../bibliothq.csv")
-    test.index=test["livres"]
-    del test["livres"]
-    gmm.fit(test)
-    print(gmm.means_)
-    print(gmm.covariances_)
-"""
-
+   main()
+   

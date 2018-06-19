@@ -44,7 +44,6 @@ def calcDiffs(cluster):
 def traitement(data):
     pafKmeans=kmeans.PafKmeans(data)
     centres, clusters=pafKmeans.result()
-    print (clusters)
     return clean.clean_kmeans(clusters, centres)
 
 def contrast(data):
@@ -58,14 +57,15 @@ def contrast(data):
 
 def graphicsClusters(data):
     clusterList=traitement(data)
+    """
     for k in clusterList:
         plt.scatter(k.points.longueur,k.points.fibres)
         plt.title('Classification K-means ')
         plt.xlabel("longueur")
         plt.ylabel("fibres")
         plt.show()
-        print(k.points.index)
-        
+        print(k.points)
+       """ 
 
 if __name__ == "__main__":
     #test of the function
@@ -74,7 +74,7 @@ if __name__ == "__main__":
                      columns = ['x', 'y', 'z'])
     c = cluster.Cluster(d, np.array([0, 0, 0.3]), 0)
     print(calcDiffs(c)) 
-    """
+    
     data = pd.read_csv("../../fruitsModified.csv")
     del data["Unnamed: 0"]
     del data["v_eau"]
@@ -87,3 +87,8 @@ if __name__ == "__main__":
     clst, crst  = contrast(data)
     print(*[cl.points for cl in clst], sep = '\n')
     print(*[cl.points for cl in crst], sep = '\n')
+"""
+    data = pd.read_csv("../../fruitsModified.csv")
+    data.index=data["Unnamed: 0"]
+    del data["Unnamed: 0"]
+    graphicsClusters(data)

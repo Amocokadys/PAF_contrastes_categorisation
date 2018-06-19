@@ -4,8 +4,16 @@ import pandas as pd
 import numpy as np
 import math as m
 
-# returns a list of dataframes (one for each core cluster + one for the remaining points) and the centers
+# 
 def clean_kmeans(data, centers):
+    """
+    clean the clusters returned by the kmeans algorithm
+    first, it selects the core of each cluster, and then for each point not in that core, it associates it 
+    with the closest cluster (for the standardized distance)
+
+    returns a list of dataframes (one for each core cluster + one for the remaining points) and the centers
+    """
+
     nb_clusters = len(centers)
     centers=np.array(centers)
 
@@ -28,7 +36,7 @@ def clean_kmeans(data, centers):
         
         remainingData.append(srt_data[m.ceil(0.2*len(clusters[i]))+1:])
         
-        coreDataframe = pd.DataFrame(coreCluster, columns=["x", "y"])
+        coreDataframe = pd.DataFrame(coreCluster, columns=clusters[0].columns)
 
         dataframeList.append(coreDataframe)
         
@@ -40,7 +48,7 @@ def clean_kmeans(data, centers):
         for j in range(len(remainingData[i])):
             tmpData.append(remainingData[i][j])
             
-    remainingData = pd.DataFrame(np.array(tmpData), columns=["x", "y"])
+    remainingData = pd.DataFrame(np.array(tmpData), columns=clusters[0].columns)
     dataframeList.append(remainingData)
 
     return dataframeList, centers

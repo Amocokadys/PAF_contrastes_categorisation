@@ -1,4 +1,4 @@
-import Cluster
+import cluster
 
 import sys
 import pandas as pd
@@ -30,5 +30,5 @@ if __name__ == "__main__":
     d = pd.DataFrame(np.array([[-5, 5, 0], [-4, 4, 0.1], [-7, 4, 0.5], [-4, 7, 6], [-7, 7, 0.9],\
                                [5, -5, 8], [4, -4, 0.05], [7, -4, 0.6], [4, -7, 2], [7, -7, 0]]),\
                      columns = ['x', 'y', 'z'])
-    c = Cluster.Cluster(d, np.array([0, 0, 0.3]), 0)
+    c = cluster.Cluster(d, np.array([0, 0, 0.3]), 0)
     print(calcDiffs(c))

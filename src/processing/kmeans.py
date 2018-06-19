@@ -57,44 +57,44 @@ class PafKmeans:
         return self.model.cluster_centers_, self.dataframe
     
 
+if __name__=="__main__":
+    test = pd.read_csv("fruitsModified2.csv")
+    del test["Unnamed: 0"]
+    pafkmeans = PafKmeans(test)
+    centers, data = pafkmeans.result()
 
-test = pd.read_csv("fruitsModified2.csv")
-del test["Unnamed: 0"]
-pafkmeans = PafKmeans(test)
-centers, data = pafkmeans.result()
+    #Visualisation des clusters formés par K-Means
+    plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+    plt.title('Classification K-means ')
+    plt.xlabel("teintes")
+    plt.ylabel("fibres")
+    plt.show()
 
-#Visualisation des clusters formés par K-Means
-plt.scatter(data.teinte,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
-plt.title('Classification K-means ')
-plt.xlabel("teintes")
-plt.ylabel("fibres")
-plt.show()
+    plt.scatter(data.teinte,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+    plt.xlabel("teintes")
+    plt.ylabel("longueur")
+    plt.show()
 
-plt.scatter(data.teinte,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
-plt.xlabel("teintes")
-plt.ylabel("longueur")
-plt.show()
+    #cluster en 3D
+    fig=plt.figure(1,figsize=(4,3))
+    ax=Axes3D(fig,rect=[0,0,0.95,1],elev=48,azim=134)
+    ax.scatter(data.teinte, data.fibres, data.longueur,c=pafkmeans.model.labels_.astype(np.float), edgecolor='k')
 
-#cluster en 3D
-fig=plt.figure(1,figsize=(4,3))
-ax=Axes3D(fig,rect=[0,0,0.95,1],elev=48,azim=134)
-ax.scatter(data.teinte, data.fibres, data.longueur,c=pafkmeans.model.labels_.astype(np.float), edgecolor='k')
+    ax.w_xaxis.set_ticklabels([])
+    ax.w_yaxis.set_ticklabels([])
+    ax.w_zaxis.set_ticklabels([])
 
-ax.w_xaxis.set_ticklabels([])
-ax.w_yaxis.set_ticklabels([])
-ax.w_zaxis.set_ticklabels([])
+    plt.title("Classification k-mean 3D")
 
-plt.title("Classification k-mean 3D")
-
-ax.dist = 12
-plt.show()
+    ax.dist = 12
+    plt.show()
 
 
-""" Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
-res=pafkmeans.silhouette
-print("res = ",res)
-print("k =",pafkmeans.number)
-plt.plot(np.arange(2, 11,1), res, 'ro')
-plt.xlabel("k")
-plt.ylabel("Score sur 1")
-plt.show()
+    """ Tracé de la métrique silhouette : plus on est proche de 1, plus le nombre de clusters est ok"""
+    res=pafkmeans.silhouette
+    print("res = ",res)
+    print("k =",pafkmeans.number)
+    plt.plot(np.arange(2, 11,1), res, 'ro')
+    plt.xlabel("k")
+    plt.ylabel("Score sur 1")
+    plt.show()

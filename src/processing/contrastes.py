@@ -1,7 +1,8 @@
-import cluster
-
 import pandas as pd
 import numpy as np
+import clean
+import kmeans
+import matplotlib.pyplot as plt
 
 def calcDiffs(cluster):
     """
@@ -21,10 +22,32 @@ def calcDiffs(cluster):
         diffs = diffs.append(norm_new, ignore_index = True)
     return diffs
 
+def traitement(data):
+    pafKmeans=kmeans.PafKmeans(data)
+    centres, clusters=pafKmeans.result()
+    return clean.clean_kmeans(clusters, centres)
+
+def contrast(data):
+    processed_data = traitement(data)
+    contrast_data = pd.DataFrame(columns = data.columns)
+    for clst in processed_data:
+        diffs = calcDiffs(clst)
+        contrast_data = contrast_data.append(diffs)
+    return processed_data, traitement(contrast_data)
+
 if __name__ == "__main__":
     #test of the function
+    """
     d = pd.DataFrame(np.array([[-5, 5, 0], [-4, 4, 0.1], [-7, 4, 0.5], [-4, 7, 6], [-7, 7, 0.9],\
                                [5, -5, 8], [4, -4, 0.05], [7, -4, 0.6], [4, -7, 2], [7, -7, 0]]),\
                      columns = ['x', 'y', 'z'])
     c = cluster.Cluster(d, np.array([0, 0, 0.3]), 0)
-    print(calcDiffs(c))
+    print(calcDiffs(c)) """
+    
+    data = pd.read_csv("../../fruitsModified.csv")
+    del data["Unnamed: 0"]
+    clst, crst_clst = contrast(data)
+    print(*[cl.points for cl in clst], sep = '\n')
+    print(*[cl.points for cl in crst_clst], sep = '\n')
+
+    """ TODO : affichage """

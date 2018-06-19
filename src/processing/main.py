@@ -1,5 +1,4 @@
 import algo
-import cluster
 import contrastes
 import etape2
 import kmeans

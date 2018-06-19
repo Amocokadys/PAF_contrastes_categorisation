@@ -47,6 +47,7 @@ def clean_kmeans(data, centers):
 
     returns a list of cluster objects (the cleaned clusters)
     """
+    
 
     nb_clusters = len(centers)
     centers=np.array(centers)
@@ -58,22 +59,20 @@ def clean_kmeans(data, centers):
 
     # removes the cluster feature from the dataset
     for c in clusters:
-        del(c["category"])
-
+        del c["category"]
     # clean clusters by selecting the 20% points of the cluster nearest to the center
     # we build as many dataframes as the number of clusters, and a dataframe which contains remaining data
     dataframeList = []
     remainingData = []
     for i in range(nb_clusters):
         srt_data = sorted(clusters[i].values, key = lambda x:sum((x-centers[i])**2))
-        lim = m.ceil(0.2*len(clusters[i]))+1 # the limit of the data to select (20% of the sorted data)
+        lim = m.ceil(0.5*len(clusters[i]))+1 # the limit of the data to select (20% of the sorted data)
         coreCluster = srt_data[:lim]
         remainingData.extend(srt_data[lim:])
         coreDataframe = pd.DataFrame(coreCluster, columns=clusters[0].columns)
         dataframeList.append(coreDataframe)
 
     remainingData = pd.DataFrame(np.array(remainingData), columns=clusters[0].columns) # turns the remaining data list into an dataframe
-    
     return clusteriseAvecEcartsTypes(dataframeList, centers, remainingData)
 
 

@@ -10,12 +10,15 @@ Date …………………………………………………… : 19/06/2018
 Description du fichier …… : Cartouche
 """
 
-import pandas as pd
-from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
+import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+
 #from sklearn import metrics
 
 class PafKmeans:
@@ -101,14 +104,14 @@ def graphic_elbow(pafkmeans,title):
 def graphic_clusters_fruits(pafkmeans):
     #Visualisation des clusters formés par K-Means
     centers,data=pafkmeans.result()
-    plt.scatter(data.r,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
+    plt.scatter(data.longueur,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
     plt.title('Classification K-means ')
-    plt.xlabel("teintes")
+    plt.xlabel("longueur")
     plt.ylabel("fibres")
     plt.show()
     
     plt.scatter(data.r,data.longueur,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
-    plt.xlabel("teintes")
+    plt.xlabel("rouge")
     plt.ylabel("longueur")
     plt.show()
     
@@ -125,6 +128,28 @@ def graphic_clusters_fruits(pafkmeans):
 
     ax.dist = 12
     plt.show()
+    
+    
+def datasList(data):
+    """ create list of datas """
+    data = data.sort_values(by='category')
+    ordo = [[] for k in range(len(data.columns)-1)] #datas
+    absc = [] #categories
+    for row in data.iterrows():
+        absc.append(row[1][len(data.columns)-1])
+        for k in range(len(data.columns)-1):
+            ordo[k].append(row[1][k])
+    return ordo,absc
+    
+def afficherDatasCategory(data):
+    """ print all datas/categories """
+    ordo,absc=datasList(data)
+    for k in range(len(data.columns)-1):
+        plt.plot(absc,ordo[k],'or')
+        plt.xlabel("categories")
+        plt.ylabel(data.columns[k])
+        plt.title(data.columns[k] + "/category")
+        plt.show()
 
 
 def main():
@@ -133,9 +158,22 @@ def main():
     graphic_elbow(pafkmean_livres,"Elbow of books")
     graphic_elbow(pafkmean_fruits,"Elbow of fruits")
     graphic_clusters_fruits(pafkmean_fruits)
+    
+    afficherDatasCategory(pafkmean_livres.dataframe)
+    afficherDatasCategory(pafkmean_fruits.dataframe)
+    
     print("k_fruits = ",pafkmean_fruits.number)
     print("k_books = ",pafkmean_livres.number)
     
 if __name__ == "__main__":
     main()
+    """
+    gmm = GaussianMixture(n_components=2)
+    test=pd.read_csv("../../bibliothq.csv")
+    test.index=test["livres"]
+    del test["livres"]
+    gmm.fit(test)
+    print(gmm.means_)
+    print(gmm.covariances_)
+"""
 

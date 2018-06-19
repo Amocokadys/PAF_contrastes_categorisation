@@ -58,15 +58,25 @@ def contrast(data):
     del contrast_data["category"]
     return processed_data, traitement(contrast_data)
 
+def graphicsClusters(data):
+    clusterList=traitement(data)
+    for k in clusterList:
+        plt.scatter(k.points.longueur,k.points.fibres)
+        plt.title('Classification K-means ')
+        plt.xlabel("longueur")
+        plt.ylabel("fibres")
+        plt.show()
+        print(k.points.index)
+        
+
 if __name__ == "__main__":
     #test of the function
-    """
-    d = pd.DataFrame(np.array([[-5, 5, 0], [-4, 4, 0.1], [-7, 4, 0.5], [-4, 7, 6], [-7, 7, 0.9],\
+    """d = pd.DataFrame(np.array([[-5, 5, 0], [-4, 4, 0.1], [-7, 4, 0.5], [-4, 7, 6], [-7, 7, 0.9],\
                                [5, -5, 8], [4, -4, 0.05], [7, -4, 0.6], [4, -7, 2], [7, -7, 0]]),\
                      columns = ['x', 'y', 'z'])
     c = cluster.Cluster(d, np.array([0, 0, 0.3]), 0)
-    print(calcDiffs(c)) """
-    
+    print(calcDiffs(c)) 
+    """
     data = pd.read_csv("../../fruitsModified.csv")
     del data["Unnamed: 0"]
     del data["v_eau"]

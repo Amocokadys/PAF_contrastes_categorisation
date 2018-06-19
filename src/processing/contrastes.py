@@ -17,8 +17,6 @@ def calcDiffs(cluster):
 
     for idx, row in cluster.points.iterrows():
         new = row - cluster.centre # computing the difference
-        diffs = diffs.append(new, ignore_index = True)
-    """
         valeursPropres,passage=np.linalg.eig(cluster.matriceCov)
         somme=0
         for sigma in valeursPropres:
@@ -40,7 +38,6 @@ def calcDiffs(cluster):
         condition = norm_new < maximum/10
         norm_new.mask(condition, other = 0, inplace = True) # selection of the greatest values (greater than max/10)
         diffs = diffs.append(norm_new, ignore_index = True)
-    """
 
     return diffs
 

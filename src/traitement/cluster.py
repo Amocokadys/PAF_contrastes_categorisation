@@ -1,4 +1,7 @@
 import pandas as pd
+from numpy.linalg import *
+import numpy as np
+
 
 class Cluster:
     """classe décrivant un cluster par
@@ -41,8 +44,24 @@ class Cluster:
     #arguments=point : arraylist contenant uniquement les coordonnées du point
     #sortie=float distance du point au cluster
     def distance(self,point):
-        matriceInverse=np.linalg.inv(self.matriceCov)
-        vect=np.dot(matriceInverse,point)
+        """function that calculates the distance between the argument point and the cluster"""
+        valeursPropres,passage=eig(self.matriceCov)
+        print(passage)
+        point=np.dot(passage,point)
+        somme=0
+        for sigma in valeursPropres:
+            if (sigma != 0):
+                somme+=(1/sigma**2)
+        n=len(valeursPropres)
+        for k in range(n):              #the diagonal matrix is being inversed, together with the replacement of the '1/0' by somme
+            if (valeursPropres[k]==0):
+                valeursPropres[k]=somme
+            else:
+                valeursPropres[k]=1/valeursPropres[k]
+        diagonale=np.zeros((n,n))
+        for k in range(n):
+            diagonale[k][k]=valeursPropres[k]
+        vect=np.dot(diagonale,point)
         norme=0
         for x in vect:
             norme+=x*x

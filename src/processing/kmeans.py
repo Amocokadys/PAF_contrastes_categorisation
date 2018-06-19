@@ -59,11 +59,12 @@ class PafKmeans:
             ang=abs(np.arctan(pentes[0])-np.arctan(pentes[k]))
             k+=1
             
-        self.number=k
+        self.number=10#k
         
     def newDataFrame(self):
         """ adds the column category in the dataframe with the labels of the clusters """
         self.dataframe['category'] = pd.Series(self.model.labels_, index = self.dataframe.index)
+        #self.dataframe['nomDonnees'] = pd.Series(self.dataframe.index,index=self.dataframe.index)
         
     def result(self):
         """ return the coordinates of cluster's centers and the dataframe"""
@@ -75,6 +76,7 @@ class PafKmeans:
 
 def test_fruits():
     test = pd.read_csv("../../fruitsModified.csv")
+    test.index=test["Unnamed: 0"]
     del test["Unnamed: 0"]
     pafkmeans=PafKmeans(test)
     #centers,data = pafkmeans.result()
@@ -102,7 +104,7 @@ def graphic_elbow(pafkmeans,title):
     plt.show()
 
 def graphic_clusters_fruits(pafkmeans):
-    #Visualisation des clusters formés par K-Means
+    """ Visualisation des clusters formés par K-Means """
     centers,data=pafkmeans.result()
     plt.scatter(data.longueur,data.fibres,c=pafkmeans.model.labels_.astype(np.float),edgecolor='k')
     plt.title('Classification K-means ')
@@ -151,16 +153,35 @@ def afficherDatasCategory(data):
         plt.title(data.columns[k] + "/category")
         plt.show()
 
+def afficherChaqueCluster(pafkmean):
+    """ Print each cluster """
+    dataframe = pafkmean.dataframe
+    for k in range(pafkmean.number):
+        masque = dataframe['category']==k
+        newDataframe=dataframe[masque]
+        print(newDataframe)
+        plt.scatter(newDataframe.longueur,newDataframe.fibres)
+        plt.title('Classification K-means ')
+        plt.xlabel("longueur")
+        plt.ylabel("fibres")
+        plt.show()
+        print(newDataframe.index)
 
 def main():
     pafkmean_livres=test_livres()
     pafkmean_fruits=test_fruits()
+    """
+    
     graphic_elbow(pafkmean_livres,"Elbow of books")
     graphic_elbow(pafkmean_fruits,"Elbow of fruits")
     graphic_clusters_fruits(pafkmean_fruits)
     
     afficherDatasCategory(pafkmean_livres.dataframe)
     afficherDatasCategory(pafkmean_fruits.dataframe)
+    
+    afficherChaqueCluster(pafkmean_fruits)
+    """
+    print(pafkmean_fruits.result()[1])
     
     print("k_fruits = ",pafkmean_fruits.number)
     print("k_books = ",pafkmean_livres.number)

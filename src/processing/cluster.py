@@ -47,7 +47,7 @@ class Cluster:
     """
     def distance(self,point):
         """function that calculates the distance between the argument point and the cluster"""
-        valeursPropres,passage=eig(self.matriceCov)
+        valeursPropres,passage=np.linalg.eig(self.matriceCov)
         print(passage)
         point=np.dot(passage,point)
         somme=0

@@ -3,6 +3,7 @@ import contrastes
 import clean
 import gmm
 import pandas as pd
+from arborescence import Feuille, Arbre
 
 def traitement(data, number):
     print(data.index)
@@ -19,6 +20,17 @@ def contrast(data):
         diffs = contrastes.calcDiffs(clst)
         contrast_data = contrast_data.append(diffs)
     return processed_data, traitement(contrast_data)
+
+def test_version_inclémentale(chemin):
+	
+	data = pd.read_csv(chemin)
+	del data["ID"]
+	data.index = data["diagnosis"]
+	
+	racine = Feuille("racine")
+	
+	for k, row in data.iterrows():
+		
 
 if __name__ == "__main__":
     data = pd.read_csv("../../fruitsModified.csv")

@@ -35,7 +35,7 @@ class Feuille:
 	
 	""" classe correspondant à une donnée"""
 	
-	def __init__(self, titre, point):
+	def __init__(self, titre, point = None):
 		self.titre = titre
 		self.centre = point
 	
@@ -58,7 +58,10 @@ class Feuille:
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
-		return Arbre([self, point])
+		if point != None:
+			return Arbre([self, point])
+		else:
+			return Arbre([point])
 	
 	def __str__(self):
 		return self.titre
@@ -143,14 +146,4 @@ class Arbre(Ensemble):
 			else:
 				chaine += str(el)
 		return chaine + " ]"
-
-test = Arbre([Feuille("racine",[0,0,0])])
-
-el2 = Feuille("bis",[1,0,0])
-el2_1 = Feuille("à côté de bis",[1.0005,0,0])
-
-test += el2
-test += el2_1
-
-print(test)
 

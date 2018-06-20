@@ -30,6 +30,34 @@ def argmax_(liste,key=lambda x:x):
 			idx = i
 			maximum = key(test)
 
+class Ensemble:
+	
+	def __init__(self, points):
+		self.points = points
+		self.dimension = len(points[0])
+		
+	
+	def actualise(self):
+		
+		self.centre = np.zeros(self.dimension)
+		for el in self.points:
+			centre += el
+		self.centre /= len(self.points)
+		
+		self.matrice = np.zeros((self.dimension, self.dimension))
+		for i in range(self.dimension):
+			for j in range(i,self.dimension):
+				for el in self.points :
+					self.matrice[i][j] += (el[i] - self.centre[i])*(el[j] - self.centre[j])
+				self.matrice[j][i] = self.matrice[i][j]
+		matrice /= len(self.points)
+
+	def distance(self, point):
+		point_centre = point - centre
+		return math.sqrt(np.dot(	np.dot(point_centre,np.inv(self.matrice)),\
+								np.transpose(point_centre)))
+
+
 class Feuille:
 	
 	def __init__(self, titre, point):
@@ -44,16 +72,16 @@ class Feuille:
 	
 	def matrice(self):
 		return np.eye(len(point)) * _CONSTANTE
-
-class Arbre(Cluster):
-			
-	self.nombre_instance = 0	
 	
-	def mahalanobis(self, point):
-		point_centre = np.array([point]) - np.array([centre])
-		return math.sqrt(np.dot(	np.dot(point_centre,np.inv(self.matriceCov)),\
-								np.transpose(point_centre)))
+	def distance(self, point):
+		somme = 0
+		for i in range(len(point)):
+			somme += (point[i] - self.point[i])**2
+		return math.sqrt(somme) * _CONSTANTE
 
+class Arbre(Ensemble):
+			
+	self.nombre_instance = 0
 	
 	def __init__(self, enfants, pater=None, label=None):
 		self.enfants = enfants
@@ -91,6 +119,8 @@ class Arbre(Cluster):
 		
 		#random = np.random.random(len(enfants[0]),len(enfants[0]))
 		#self.matriceCov += pd.DataFrame(random * 10e-6)
+	
+	def 
 	
 	def _private_liste_points(self):
 		points = []

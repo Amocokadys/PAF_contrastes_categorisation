@@ -8,7 +8,7 @@ Created on Tue Jun 19 10:57:46 2018
 
 import math
 import numpy as np
-import pandas as pd
+from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER
 
 
 def argmax_(liste,key=lambda x:x):
@@ -24,37 +24,48 @@ def argmax_(liste,key=lambda x:x):
 		except StopIteration:
 			return idx, maximum
 		i += 1
-		if key(test) > maximum or i == 0:
+		if i == 0 or key(test) > key(maximum):
 			idx = i
-			maximum = key(test)
+			maximum = test
 
 
 
 
 class Feuille:
 	
+	""" classe correspondant à une donnée"""
+	
 	def __init__(self, titre, point):
 		self.titre = titre
-		self.point = point
+		self.centre = point
 	
 	def feuille(self):
 		return True
 	
 	def __iter__(self):
-		return iter(self.point)
+		return iter(self.centre)
 	
 	def matrice(self):
-		return np.eye(len(point)) * _CONSTANTE
+		return np.eye(len(self.centre)) * _CONSTANTE
 	
 	def distance(self, point):
+		
+		""" distance euclidienne """
+		
 		somme = 0
-		for i in range(len(point)):
-			somme += (point[i] - self.point[i])**2
-		return math.sqrt(somme) * _CONSTANTE
+		for i in range(len(point.centre)):
+			somme += (point.centre[i] - self.centre[i])**2
+		return math.sqrt(somme) / _CONSTANTE
+	
+	def __add__(self, point):
+		return Arbre([self, point])
+	
+	def __str__(self):
+		return self.titre
 
 class Arbre(Ensemble):
 			
-	self.nombre_instance = 0
+	nombre_instance = 0
 	
 	def __init__(self, enfants, pater=None, label=None):
 		self.enfants = enfants
@@ -63,32 +74,83 @@ class Arbre(Ensemble):
 		self.label = label
 		self.pater = pater
 		self.groupe = Ensemble.__init__(self, descendants, True)
-		self.nombre_instance += 1
+		self.actualise_enfants()
+		Arbre.nombre_instance += 1
 		
-	def feuille():
+	def feuille(self):
 		return False
 	
 	def actualise_enfants(self):
-		centres = [el.centre for el in enfants]
-		self.matrice_enfants = Ensemble.__init__(self, centres, False)
+		
+		""" crée et actualise une espérance/matrice de covariance correspondant
+		aux centres des noeuds enfants"""
+		
+		centres = [el.centre for el in self.enfants]
+		self.matrice_enfants = Ensemble(centres, False)
 	
-	def nouvelle_donne(self, livre):
-		min_enfant, min_distance = argmax_(enfants, key=lambda x:-)
+	def __add__(self, livre):
+		
+		""" ajout d'une donnée à l'arbre """
+		
+		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))
 	
-	
+		if min_distance.distance(livre) > _SEUIL_NOUVEAU_CLUSTER:
+			
+			try:
+				livre.feuille()
+				self.enfants.append(livre)
+			except AttributeError:
+				self.enfants += livre
+			
+			Ensemble.__add__(self,livre.centre)
+			self.matrice_enfants.points.append(livre.centre)
+			self.matrice_enfants.actualise()
+			
+			self.regroupement()
+		
+		else:
+			
+			self.enfants[min_enfant] += livre
+			Ensemble.__add__(self, livre.centre)
+		return self
+					
 		
 		#random = np.random.random(len(enfants[0]),len(enfants[0]))
 		#self.matriceCov += pd.DataFrame(random * 10e-6)
-	
-	def 
-	
+		
 	def _private_liste_points(self):
+		
+		""" recherche récursive des descendants """
+		
 		points = []
 		for el in self.enfants:
 			if el.feuille():
-				points.append(el.points)
+				points.append(el.centre)
 			else:
 				points += el._private_liste_points()
 		return points
 		
+	def regroupement(self):
+		"""méthode visant à regrouper si besoin les enfants d'un noeud,
+		pour les regrouper dans un cluster fils """
+		pass
+	
+	def __str__(self):
+		chaine = "[ "
+		for el in self.enfants:
+			if el.feuille():
+				chaine += "\"" + el.titre + "\", "
+			else:
+				chaine += str(el)
+		return chaine + " ]"
+
+test = Arbre([Feuille("racine",[0,0,0])])
+
+el2 = Feuille("bis",[1,0,0])
+el2_1 = Feuille("à côté de bis",[1.0005,0,0])
+
+test += el2
+test += el2_1
+
+print(test)
 

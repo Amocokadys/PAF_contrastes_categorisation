@@ -10,29 +10,41 @@ import math
 import numpy as np
 
 _CONSTANTE = 0.001
+_SEUIL_NOUVEAU_CLUSTER = 2
 
 
 class Ensemble:
 	
+	"""classe gérant une liste de vecteurs, et calculant leur espérance / matrice de covariance"""
+	
 	def __init__(self, points, mode_incr = False):
+		
+		"""
+		- mode_incr == False    --> la liste des points est stockée dans la classe
+		- mode_incl == True     --> seule la matrice est stockée, 
+								les points sont ajoutées un à un, et sont oubliés
+								dès que la matrice de covariance a été modifiée
+		"""
+		
 		self.dimension = len(points[0])
-		self.nombre_descendant = len(points)
+		
+		
+		self.points = points
+		self.actualise()
 		if mode_incr:
-			self.centre = points[0]
-			self.matrice = np.eye(self.dimension)
-			self.points = None
-		else:
-			self.points = points
-			self.actualise()
-		
-		
+			self.points = None				
 	
 	def actualise(self):
 		
+		""" recalcule l'espérance et la matrice de covariance
+		(non valable en mode incr) """
+		
+		self.nombre_descendant = len(self.points)
 		self.centre = np.zeros(self.dimension)
+		
 		for el in self.points:
 			self.centre += el
-		self.centre /= len(self.points)
+		self.centre /= self.nombre_descendant
 		
 		self.matrice = np.zeros((self.dimension, self.dimension))
 		for i in range(self.dimension):
@@ -40,11 +52,14 @@ class Ensemble:
 				for el in self.points :
 					self.matrice[i][j] += (el[i] - self.centre[i])*(el[j] - self.centre[j])
 				self.matrice[j][i] = self.matrice[i][j]
-		self.matrice /= len(self.points)
-		self.matrice += np.eye((self.dimension, self.dimension)) * _CONSTANTE / len(self.points)
+		
+		self.matrice /= self.nombre_descendant
+		self.matrice += np.eye(self.dimension) * \
+						_CONSTANTE / self.nombre_descendant
 
 	def distance(self, point):
-		point_centre = point - self.centre
+		""" distance de Mahalanobis """
+		point_centre = point.centre - self.centre
 		return math.sqrt(np.dot(	np.dot(point_centre,np.linalg.inv(self.matrice)),\
 								np.transpose(point_centre)))
 	
@@ -67,4 +82,11 @@ class Ensemble:
 		self.centre = (self.nombre_descendant * self.centre + point)/(self.nombre_descendant + 1)
 		
 		self.nombre_descendant += 1
+		
+		if self.points != None:
+			self.points.append(point)
+		
 		return self
+	
+	def __iter__(self):
+		return iter(self.points)

@@ -35,11 +35,6 @@ class Cluster:
 			pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
 			new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
 			points = points.append(new_data)
-		if centre == None:
-			centre = [0]*len(points[0])
-			for i in range(len(points)):
-				centre = [centre[j]+points[i][j] for j in range(len(points[0]))]
-			centre = [centre[i]/len(points) for i in range(len(points))]
 		self.centre=centre
 		self.numero=numero
 		self.points=points

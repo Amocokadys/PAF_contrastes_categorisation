@@ -18,15 +18,11 @@ class Cluster:
         nbLigne = len(dataframe)
         Esperances = dataframe.mean() # mean vector
         matrice = [] # covariance matrix to calculate
-        
-        print("nbligne",nbLigne)
-        print("colonnes",dataframe.columns)
-        
         for i in dataframe.columns :
             ligne_i=[]
             for j in dataframe.columns :
                 covIJ = 0
-                for k in range(nbLigne) :      
+                for k in dataframe.index :
                     covIJ += (dataframe[i][k] - Esperances[i]) * (dataframe[j][k] - Esperances[j])
                 covIJ = covIJ/nbLigne
                 ligne_i.append(covIJ)
@@ -91,7 +87,7 @@ class Cluster:
         for idx in self.points.index:
             self.propDict[idx] = 0
 
-        for idx, _ in self.points.iterrows:
+        for idx, _ in self.points.iterrows():
             self.propDict[idx] += 1
 
         for idx in self.points.index:
@@ -110,12 +106,14 @@ def dataframeToCluster(dataframe,means):
 
     clusters = []
     for k in range(len(datas)):
+        del(datas[k]['category'])
+        print(datas[k])
         cluster = Cluster(datas[k],means[k],k)
         clusters.append(cluster)
 
     return clusters
-"""
-dataframe=pd.DataFrame([[1,2,3],[2,4,6],[3,6,9],[4,8,12]])
-dataframe["category"]=[0,1,1,1]
-clusters=dataframeToCluster(dataframe,[0,1])
-"""
+
+"""dataframe=pd.DataFrame([[1,2,3],[2,4,6],[3,6,9],[4,8,12],[2,4,5],[6,2,5]])
+dataframe["category"]=[0,0,1,1,0,1]
+clusters=dataframeToCluster(dataframe,[3,1])"""
+

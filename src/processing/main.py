@@ -4,11 +4,11 @@ import etape2
 import kmeans
 import pandas as pd
 
-def traitement(data):
-    pafKmeans=kmeans.PafKmeans(data)
-    centres, clusters=pafKmeans.result()
-    cln_clusters = algo.clean_kmeans(clusters, centres)
-    return etape2.mainEtape2(cln_clusters)
+def traitement(data, number):
+    pafGmm = gmm.PafGMM(data, number)
+    clusters, centres = pafGmm.result()
+    clusterList = cluster.dataframeToCluster(clusters, centres)
+    return clusterList
 
 def contrast(data):
     processed_data = traitement(data)

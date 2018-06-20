@@ -47,7 +47,7 @@ class PafGMM:
         #self.findElbow()
         self.gmm(self.number)
         self.newDataFrame()
-        return self.dataframe
+        return self.dataframe, self.model.means_
     
     
 class Contraste:
@@ -133,27 +133,25 @@ def afficherChaqueCluster(pafGMM):
         plt.show()
         print(newDataframe.index)
 
-    
-data = pd.read_csv("../../fruitsModified.csv")
-data.index = data["Unnamed: 0"]
-del data["Unnamed: 0"]
+if __name__ == "__main__":
+    data = pd.read_csv("../../fruitsModified.csv")
+    data.index = data["Unnamed: 0"]
+    del data["Unnamed: 0"]
 
+    pafgmm = PafGMM(data, 10)
+    categorisation = pafgmm.result()
 
-pafgmm = PafGMM(data, 10)
-categorisation = pafgmm.result()
+    cr = Contraste(categorisation, pafgmm.model.means_, 10)
+    contraste = cr.calcul()
 
-cr = Contraste(categorisation, pafgmm.model.means_, 10)
-contraste = cr.calcul()
+    print(categorisation.sort_values(by = "category"))
+    print(contraste.sort_values(by = "category"))
 
-print(categorisation.sort_values(by = "category"))
-print(contraste.sort_values(by = "category"))
-
-
-#graphic_clusters_fruits(categorisation)
-#afficherDatasCategory(categorisation)
-afficherDatasCategory(contraste)
-afficherChaqueCluster(pafgmm)
-print("******************************")
-afficherChaqueCluster(cr.pafgmm)
+    #graphic_clusters_fruits(categorisation)
+    #afficherDatasCategory(categorisation)
+    afficherDatasCategory(contraste)
+    afficherChaqueCluster(pafgmm)
+    print("******************************")
+    afficherChaqueCluster(cr.pafgmm)
 
 

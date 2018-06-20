@@ -73,5 +73,5 @@ class Cluster:
         with standard deviation normalisation
     """
     def ajouterPoint(self,point):
-        new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(self.points), stop=len(self.points)+1, step=1))
-        self.points = self.points.append(new_data)
+        #new_data = pd.DataFrame([point], columns = self.points.columns, index = point.index)
+        self.points = self.points.append(point)

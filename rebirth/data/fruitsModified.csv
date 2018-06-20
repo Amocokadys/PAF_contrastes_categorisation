@@ -1,4 +1,4 @@
-,longueur,v_longueur,largeur,v_largeur,r,v,b,v_rvb,sucre,v_sucre,eau,v_eau,fibres,v_fibre
+fruit,longueur,v_longueur,largeur,v_largeur,r,v,b,v_rvb,sucre,v_sucre,eau,v_eau,fibres,v_fibre
 abricot,7.0,0.5,5.0,0.6,230.0,126.0,48.0,10.0,2.0,5.0,87.0,5.0,1.8,0.5
 pomme,8.0,3.0,8.0,3.0,52.0,201.0,36.0,40.0,50.0,1.5,85.0,3.0,1.4,1.0
 carotte,15.0,7.0,3.0,1.5,244.0,102.0,27.0,10.0,4.0,1.0,90.0,3.0,2.7,0.6

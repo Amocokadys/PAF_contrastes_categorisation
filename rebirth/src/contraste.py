@@ -22,7 +22,6 @@ class Contraste:
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
-        self.sharp=None
         
     def difference(self,cluster):
         """ return the difference between a dataframe and its center """
@@ -55,6 +54,7 @@ class Contraste:
         
     def contrast(self):
         """ reapply kmean on each sharpens cluster """
+
         for cluster in self.clustersList:
             diff = self.difference(cluster)
             sharp = self.sharpening(diff)
@@ -63,11 +63,12 @@ class Contraste:
             newDataFrame, centers = newGmm.result()
             clusterisationObject = clusterisation.Clusterisation(newDataFrame,centers)
             subClustersList = clusterisationObject.result()
-            cluster.subClustersList=subClustersList
             
-            return sharp
+            cluster.setSubClustersList(subClustersList)
+            cluster.setSharp(sharp)
+        
             
     def result(self):
         """ return the clustersList modified """
-        self.sharp=self.contrast()
-        return self.sharp
+        self.contrast()
+        return self.clustersList

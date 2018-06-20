@@ -53,6 +53,11 @@ class Cluster:
         self.propDict={}
         self.label=""
         self.updateLabel()
+        self.subClusters=None
+        
+        
+    def setSubClusters(self,clusters):
+        self.subClusters=clusters
       
       
         

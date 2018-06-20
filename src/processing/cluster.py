@@ -18,11 +18,15 @@ class Cluster:
         nbLigne = len(dataframe)
         Esperances = dataframe.mean() # mean vector
         matrice = [] # covariance matrix to calculate
+        
+        print("nbligne",nbLigne)
+        print("colonnes",dataframe.columns)
+        
         for i in dataframe.columns :
             ligne_i=[]
             for j in dataframe.columns :
                 covIJ = 0
-                for k in range(nbLigne) :
+                for k in range(nbLigne) :      
                     covIJ += (dataframe[i][k] - Esperances[i]) * (dataframe[j][k] - Esperances[j])
                 covIJ = covIJ/nbLigne
                 ligne_i.append(covIJ)
@@ -31,13 +35,14 @@ class Cluster:
     
     
     def __init__(self,points,centre,numero):
+        
         if (len(points) == 2) :
             pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
             new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
             points = points.append(new_data)
         self.centre=centre
         self.numero=numero
-        self.points=points
+        self.points=points #un dataframe
         self.matriceCov=self.matriceCovariance(points)
         self.propDict={}
         self.label=""
@@ -79,6 +84,7 @@ class Cluster:
         new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(self.points), stop=len(self.points)+1, step=1))
         self.points = self.points.append(new_data)
 
+
     
     def updatePropDict(self):
         self.propDict = {}
@@ -94,3 +100,22 @@ class Cluster:
     def updateLabel(self):
         self.updatePropDict()
         self.label=max(self.propDict, key = self.propDict.get)
+
+
+def dataframeToCluster(dataframe,means):
+    datas = []
+    for k in range(len(means)):
+        masque = dataframe['category']==k
+        datas.append(dataframe[masque])
+
+    clusters = []
+    for k in range(len(datas)):
+        cluster = Cluster(datas[k],means[k],k)
+        clusters.append(cluster)
+
+    return clusters
+"""
+dataframe=pd.DataFrame([[1,2,3],[2,4,6],[3,6,9],[4,8,12]])
+dataframe["category"]=[0,1,1,1]
+clusters=dataframeToCluster(dataframe,[0,1])
+"""

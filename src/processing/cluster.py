@@ -39,6 +39,9 @@ class Cluster:
         self.numero=numero
         self.points=points
         self.matriceCov=self.matriceCovariance(points)
+        self.propDict={}
+        self.label=""
+        self.updateLabel()
         
     """ this function calculates the distance from a point to a cluster in terms of
         number of standard deviations
@@ -75,3 +78,19 @@ class Cluster:
     def ajouterPoint(self,point):
         new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(self.points), stop=len(self.points)+1, step=1))
         self.points = self.points.append(new_data)
+
+    
+    def updatePropDict(self):
+        self.propDict = {}
+        for idx in self.points.index:
+            self.propDict[idx] = 0
+
+        for idx, _ in self.points.iterrows:
+            self.propDict[idx] += 1
+
+        for idx in self.points.index:
+            self.propDict[idx] /= len(self.points)
+
+    def updateLabel(self):
+        self.updatePropDict()
+        self.label=max(self.propDict, key = self.propDict.get)

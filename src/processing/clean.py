@@ -6,12 +6,13 @@ import pandas as pd
 import numpy as np
 import math as m
 
-def clusterPlusProche(listeCluster,listeCentre,point):
+def clusterPlusProche(listeCluster, point):
     """
     find the closest cluster from the point according to the standardized distance
     """
     # instead of computing min(distance) it computes max(1/(1+distance))
     # it is to initialize the min dist to 0, and avoid problems with infinity
+    listeCentre=[clust.centre for clust in listeCluster]
     plusProche=0
     distanceMin=0 
     for k in range(len(listeCentre)):
@@ -19,8 +20,25 @@ def clusterPlusProche(listeCluster,listeCentre,point):
         if distanceCourante>distanceMin:
             plusProche=k
             distanceMin=distanceCourante
-    return plusProche
+    return listeCluster[k]
 
+
+def euclideanDistanceSquared(point1, point2):
+    somme = 0
+    for k in range(len(point1)):
+        somme += (point1[k] - point2[k])**2
+    return somme
+
+def clusterPlusProcheEuclidien(listeCluster, point):
+    """ find the closest cluster from the point according to the euclidean disatnce"""
+    distance = euclideanDistanceSquared(listeCluster[0].centre, point)
+    indice = 0
+    for k in range(1, len(listeCluster)):
+        distanceCourante = euclideanDistanceSquared(listeCluster[k].centre, point)
+        if distanceCourante < distance:
+            distanceCourante = distance
+            indice = k
+    return listeCluster[indice]
 
 def clusteriseAvecEcartsTypes(listeCluster,listeCentre,listePointsRestants):
     """

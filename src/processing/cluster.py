@@ -22,7 +22,7 @@ class Cluster:
             ligne_i=[]
             for j in dataframe.columns :
                 covIJ = 0
-                for k in range(nbLigne) :
+                for k in dataframe.index :
                     covIJ += (dataframe[i][k] - Esperances[i]) * (dataframe[j][k] - Esperances[j])
                 covIJ = covIJ/nbLigne
                 ligne_i.append(covIJ)
@@ -30,16 +30,19 @@ class Cluster:
         return(np.array(matrice))
     
     
-    def __init__(self,points,centre,numero):
-		if (len(points) == 2) :
-			pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
-			new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
-			points = points.append(new_data)
-		self.centre=centre
-		self.numero=numero
-		self.points=points
-		self.matriceCov=self.matriceCovariance(points)
+
+    def __init__(self,points,centre,):
         
+        if (len(points) == 2) :
+            pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
+            new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
+            points = points.append(new_data)
+        self.centre=centre
+        self.points=points #un dataframe
+        self.matriceCov=self.matriceCovariance(points)
+        self.propDict={}
+        self.label=""
+        self.updateLabel()
     """ this function calculates the distance from a point to a cluster in terms of
         number of standard deviations
         the input is an arraylist containing the coordinates of the point
@@ -47,8 +50,7 @@ class Cluster:
     """
     def distance(self,point):
         """function that calculates the distance between the argument point and the cluster"""
-        valeursPropres,passage=eig(self.matriceCov)
-        print(passage)
+        valeursPropres,passage=np.linalg.eig(self.matriceCov)
         point=np.dot(passage,(point-self.centre))
         somme=0
         for sigma in valeursPropres:
@@ -74,5 +76,32 @@ class Cluster:
         with standard deviation normalisation
     """
     def ajouterPoint(self,point):
-        new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(points), stop=len(points+1), step=1))
+        new_data = pd.DataFrame([point], columns = self.points.columns, index = pd.RangeIndex(start=len(self.points), stop=len(self.points)+1, step=1))
         self.points = self.points.append(new_data)
+
+
+    
+    def updatePropDict(self):
+        self.propDict = {}
+        for idx in self.points.index:
+            self.propDict[idx] = 0
+        for row in  self.points.itertuples():
+            self.propDict[row[0]] += 1
+        for idx in self.points.index:
+            self.propDict[idx] /= len(self.points)
+
+    def updateLabel(self):
+        self.updatePropDict()
+        self.label=max(self.propDict, key = self.propDict.get)
+
+
+def dataframeToCluster(dataframe,means):
+    nb_clusters = len(means)
+
+    # get clusters from data
+    clusters=[]
+    for i in range(nb_clusters):
+        clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
+                               means)) # for each cluster, selects the points in the cluster
+
+    return clusters

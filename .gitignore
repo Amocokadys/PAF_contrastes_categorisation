@@ -1,2 +1,3 @@
 livres/*
 /données_livres.csv
+*/__pycache__

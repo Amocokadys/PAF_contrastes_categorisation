@@ -112,8 +112,3 @@ def dataframeToCluster(dataframe,means):
         clusters.append(cluster)
 
     return clusters
-
-"""dataframe=pd.DataFrame([[1,2,3],[2,4,6],[3,6,9],[4,8,12],[2,4,5],[6,2,5]])
-dataframe["category"]=[0,0,1,1,0,1]
-clusters=dataframeToCluster(dataframe,[3,1])"""
-

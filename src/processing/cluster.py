@@ -30,20 +30,18 @@ class Cluster:
         return(np.array(matrice))
     
     
-    def __init__(self,points,centre,numero):
+    def __init__(self,points,centre,):
         
         if (len(points) == 2) :
             pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
             new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
             points = points.append(new_data)
         self.centre=centre
-        self.numero=numero
         self.points=points #un dataframe
         self.matriceCov=self.matriceCovariance(points)
         self.propDict={}
         self.label=""
         self.updateLabel()
-        
     """ this function calculates the distance from a point to a cluster in terms of
         number of standard deviations
         the input is an arraylist containing the coordinates of the point
@@ -86,10 +84,8 @@ class Cluster:
         self.propDict = {}
         for idx in self.points.index:
             self.propDict[idx] = 0
-
-        for idx, _ in self.points.iterrows():
-            self.propDict[idx] += 1
-
+        for row in  self.points.itertuples():
+            self.propDict[row[0]] += 1
         for idx in self.points.index:
             self.propDict[idx] /= len(self.points)
 
@@ -99,17 +95,13 @@ class Cluster:
 
 
 def dataframeToCluster(dataframe,means):
-    datas = []
-    for k in range(len(means)):
-        masque = dataframe['category']==k
-        datas.append(dataframe[masque])
+    nb_clusters = len(means)
 
-    clusters = []
-    for k in range(len(datas)):
-        del(datas[k]['category'])
-        print(datas[k])
-        cluster = Cluster(datas[k],means[k],k)
-        clusters.append(cluster)
+    # get clusters from data
+    clusters=[]
+    for i in range(nb_clusters):
+        clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
+                               means)) # for each cluster, selects the points in the cluster
 
     return clusters
 

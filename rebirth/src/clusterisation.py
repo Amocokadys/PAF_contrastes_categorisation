@@ -19,7 +19,7 @@ class Clusterisation:
         clusters=[]
         for i in range(nb_clusters):
             clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
-                                means)) # for each cluster, selects the points in the cluster
+                                means[i])) # for each cluster, selects the points in the cluster
     
         return clusters
 

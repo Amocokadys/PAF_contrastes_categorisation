@@ -17,10 +17,6 @@ import pandas as pd
 from math import sqrt
 
 def result(listeClusters, element ) :
-    
-    label = ""
-    dimensionDominante = ""
-    
     """ on attribue à element le cluster dont il est le plus proche du centre """
     distance_min = -1
     for cluster in listeClusters :
@@ -30,8 +26,8 @@ def result(listeClusters, element ) :
             cluster_element = cluster
     
     label = cluster_element.getLabel()
-    dataframe_cluster = cluster_element.getDataframe()
-    center_cluster = cluster.getCenter()
+    dataframe_cluster = cluster_element.getDataFrame()
+    center_cluster = cluster_element.getCenter()
     
     data = element - center_cluster
     
@@ -54,18 +50,18 @@ def distanceEuclidienne(point_1, point_2):
         distance += (point_1[k] - point_2[k])**2
     return distance
 
+if __name__ == "__main__":
+    ar = np.array([[1.1, 2, 3.3, 4], [2.7, 10, 5.4, 7], [5.3, 9, 1.5, 15]])
+    df = pd.DataFrame(ar, index = ['a1', 'a2', 'a3'], columns = ['A', 'B', 'C', 'D'])
 
-ar = np.array([[1.1, 2, 3.3, 4], [2.7, 10, 5.4, 7], [5.3, 9, 1.5, 15]])
-df = pd.DataFrame(ar, index = ['a1', 'a2', 'a3'], columns = ['A', 'B', 'C', 'D'])
+    element = np.array([0, 5, 3.5, 8])
+    center = np.array([3.03, 7, 3.4, 8.67])
 
-element = np.array([0, 5, 3.5, 8])
-center = np.array([3.03, 7, 3.4, 8.67])
+    values = []
+    for k in range(len(element)):
+        values.append((abs(element[k] - center[k]))/sqrt(np.array(df.var(axis=0))[k]))
 
-values = []
-for k in range(len(element)):
-    values.append((abs(element[k] - center[k]))/sqrt(np.array(df.var(axis=0))[k]))
+    indiceDominant = values.index(max(values))
+    dimensionDominante = df.columns[indiceDominant]
 
-indiceDominant = values.index(max(values))
-dimensionDominante = df.columns[indiceDominant]
-
-print(dimensionDominante)
+    print(dimensionDominante)

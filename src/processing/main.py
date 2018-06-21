@@ -4,6 +4,9 @@ import clean
 import gmm
 import pandas as pd
 from arborescence import Feuille, Arbre
+import numpy as np
+
+log_cancer = [True, True, True, True ]
 
 def traitement(data, number):
     print(data.index)
@@ -21,17 +24,27 @@ def contrast(data):
         contrast_data = contrast_data.append(diffs)
     return processed_data, traitement(contrast_data)
 
-def test_version_inclémentale(chemin):
 	
 	data = pd.read_csv(chemin)
 	del data["ID"]
 	data.index = data["diagnosis"]
 	
 	racine = Feuille("racine")
+	i = 0
+	try:
+		for k, row in data.iterrows():
+			print("ajout de l'élément ",i)
+			racine += Feuille(row.values[0],np.array(row.values[1:], dtype=np.float32))
+			i += 1
+	print(racine)
+	except KeyboardInterrupt:
+		print(racine)
 	
-	for k, row in data.iterrows():
-		
+	
 
+test_version_inclémentale("../../jeux de donne/breast_cancer/wdbc.csv")
+		
+"""
 if __name__ == "__main__":
     data = pd.read_csv("../../fruitsModified.csv")
     data.index = data["Unnamed: 0"]
@@ -44,3 +57,4 @@ if __name__ == "__main__":
     clust = clean.clusterPlusProcheEuclidien(clstList, pts)
 
     print(clust.label)
+"""

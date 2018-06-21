@@ -58,7 +58,7 @@ class Feuille:
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
-		if point != None:
+		if self.centre != None:
 			return Arbre([self, point])
 		else:
 			return Arbre([point])
@@ -146,4 +146,11 @@ class Arbre(Ensemble):
 			else:
 				chaine += str(el)
 		return chaine + " ]"
+"""
+test = Feuille("racine")
 
+test += Feuille("abricot", [0,0,0])
+test += Feuille("pêche", [1,0,0])
+test += Feuille("poire",[0.001,0,0])
+
+print(test)"""

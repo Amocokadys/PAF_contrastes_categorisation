@@ -9,7 +9,7 @@ Created on Wed Jun 20 10:59:29 2018
 import math
 import numpy as np
 
-_CONSTANTE = 0.001
+_CONSTANTE = 0.01
 _SEUIL_NOUVEAU_CLUSTER = 2
 
 

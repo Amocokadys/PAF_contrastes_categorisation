@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 class Clusterisation:
@@ -43,27 +44,31 @@ class Cluster:
         return (" dataframe: \n"+str(self.points)+"\n center:"+str(self.centre)+"\n label:"+str(self.label))
 
     def __init__(self,points,centre):
-        
+        """
         if (len(points) == 2) :
             pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
             new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
             points = points.append(new_data)
+        """
         self.centre=centre
         self.points=points #un dataframe
         self.propDict={}
         self.label=""
         self.updateLabel()
         self.subClusters=None
-        
+        self.sharpedData = None
         
     def setSubClusters(self,clusters):
         self.subClusters=clusters
       
-      
+    def setSharp(self,sharp):
+        self.sharpedData = sharp
+        
+    def getSharp(self):
+        return self.sharpedData
         
     def getDataFrame(self):
         return(self.points)    
-       
        
     def getCenter(self):
         return(self.centre)

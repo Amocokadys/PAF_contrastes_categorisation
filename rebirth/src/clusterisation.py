@@ -102,10 +102,14 @@ class SubCluster(Cluster):
     
     def __init__(self,dataframe,centers):
         super(self,dataframe,centers)
+        
+    #TODO nothing
     
         
 class MainCluster(Cluster):
     """To use the subclusters, herites from Cluster"""
     
     def __init__(self,dataframe,centers):
-        super(self,dataframe,centers)        
+        super(self,dataframe,centers)  
+        
+    #TODO add subClusterList as attribute

@@ -25,7 +25,7 @@ def result(clustersCategories, clustersContrast, element ) :
             distance_min = distance_tmp
             cluster_category = cluster
     
-    label = cluster_category.getLabel()
+    label = cluster_category.getLabel() 
     
     """ on attribue à element la liste de labels associé au cluster de contrastes
     dans lequel il se trouve s'il en est assez proche en nombre d'écarts-types """

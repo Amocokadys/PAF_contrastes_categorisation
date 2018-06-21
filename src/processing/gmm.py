@@ -140,10 +140,10 @@ if __name__=="__main__":
     
     
     pafgmm = PafGMM(data, 10)
-    categorisation = pafgmm.result()
+    categorisation = pafgmm.result()[0]
     
     cr = Contraste(categorisation, pafgmm.model.means_, 10)
-    contraste = cr.calcul()
+    contraste = cr.calcul()[0]
     
     print(categorisation.sort_values(by = "category"))
     print(contraste.sort_values(by = "category"))

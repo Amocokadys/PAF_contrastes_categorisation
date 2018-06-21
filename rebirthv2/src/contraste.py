@@ -18,7 +18,7 @@ import clusterisation
 
 class Contraste:
     
-    def __init__(self,clustersList,critere=0.05,numberCluster=3):
+    def __init__(self,clustersList,critere=0.5,numberCluster=3):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
@@ -50,7 +50,7 @@ class Contraste:
                         maxi=normalise
                         argMax=j                    
             for i in range(len(k)):
-                if(k[1][i]<self.critere*argMax):
+                if(k[1][i]<self.critere*k[1][argMax]):
                     k[1][i]=0
             
         return diff

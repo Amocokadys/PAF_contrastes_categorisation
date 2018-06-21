@@ -28,7 +28,7 @@ class Contraste:
         dataframe = cluster.getDataFrame()
         del dataframe['category']
         center = cluster.getCenter()
-        diff = dataframe-center
+        diff = abs(dataframe-center)/self.variance(dataframe)
         return diff
              
     def variance(self,dataFrame):
@@ -37,22 +37,14 @@ class Contraste:
         
     def sharpening(self,diff):
         """ sharps the dataframe in function a critere"""
-
-        var=self.variance(diff)
-
+        
+        maxiListe = diff.max(axis=0)
+        
         for k in diff.iterrows():
-            maxi=-1
-            argMax=-1
             for j in range(len(k)):
-                if(var[j]!=0):
-                    normalise = k[1][j]/np.sqrt(var[j])
-                    if(normalise>maxi):
-                        maxi=normalise
-                        argMax=j                    
-            for i in range(len(k)):
-                if(k[1][i]<self.critere*k[1][argMax]):
-                    k[1][i]=0
-            
+                if(k[1][j]<self.critere*maxiListe[j]):
+                    k[1][j]=0  
+                
         return diff
         
     def contrast(self):
@@ -61,17 +53,18 @@ class Contraste:
         for cluster in self.clustersList:
             diff = self.difference(cluster)
             sharp = self.sharpening(diff)
+            #concaténer
             
-            newGmm = gmm.GMM(sharp,self.numberCluster)
-            newDataFrame, centers = newGmm.result()
-            clusterisationObject = clusterisation.Clusterisation(newDataFrame,centers)
-            subClustersList = clusterisationObject.result()
+        #gmmsur tout 
+        newGmm = gmm.GMM(sharp,self.numberCluster)
+        newDataFrame, centers = newGmm.result()
             
-            cluster.setSubClusters(subClustersList)
-            cluster.setSharp(sharp)
+        print(newDataFrame)
         
+            #print(diff)
+            
             
     def result(self):
-        """ return the clustersList modified """
+        """ return the dataframe centré réduit sharpené """
         self.contrast()
         return self.clustersList

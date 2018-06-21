@@ -29,9 +29,6 @@ class Clusterisation:
  
  
  
- 
- 
- 
         
 class Cluster:
     """
@@ -53,7 +50,7 @@ class Cluster:
         self.centre=centre
         self.points=points #un dataframe
         self.propDict={}
-        self.label=""
+        self.label=[]
         self.updateLabel()
         self.subClusters=None
         self.sharpedData = None
@@ -85,19 +82,40 @@ class Cluster:
         self.points = self.points.append(new_data)
 
 
-    
     def updatePropDict(self):
+        """
+        this method computes a dictionnary that contains the proportions of presence of 
+        each label among the data of the cluster
+        """
         self.propDict = {}
         for idx in self.points.index:
-            self.propDict[idx] = 0
+            if '#' in idx:
+                lst_idx = [idx.split('#')[0]]
+            else:
+                lst_idx = idx.split('~')[:-1]
+            for i in lst_idx:
+                self.propDict[i] = 0
+
         for row in  self.points.itertuples():
-            self.propDict[row[0]] += 1
-        for idx in self.points.index:
-            self.propDict[idx] /= len(self.points)
+            if '#' in idx:
+                lst_idx = [idx.split('#')[0]]
+            else:
+                lst_idx = idx.split('~')[:-1]
+            for i in lst_idx:
+                self.propDict[i] += 1
+
+        for key in self.propDict.keys():
+            self.propDict[key] /= len(self.points)
 
     def updateLabel(self):
+        """
+        this method gets the major labels of the cluster by selecting only the ones that
+        at least 50% of the cluster have
+        """
         self.updatePropDict()
-        self.label=max(self.propDict, key = self.propDict.get)
+        for k in self.propDict.keys():
+            if self.propDict[k] >= 0.5:
+                self.label.append(k)
         
         
         

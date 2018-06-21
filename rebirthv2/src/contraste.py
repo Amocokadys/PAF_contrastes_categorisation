@@ -40,10 +40,8 @@ class Contraste:
         
         maxiListe = diff.max(axis=0)
         
-        print(maxiListe)
-        
         for k in diff.iterrows():
-            for j in range(len(k[1])):
+            for j in range(len(k)):
                 if(k[1][j]<self.critere*maxiListe[j]):
                     k[1][j]=0  
                 
@@ -56,14 +54,12 @@ class Contraste:
             diff = self.difference(cluster)
             sharp = self.sharpening(diff)
             #concaténer
-    
-            
             
         #gmmsur tout 
-        #newGmm = gmm.GMM(sharp,self.numberCluster)
-        #newDataFrame, centers = newGmm.result()
+        newGmm = gmm.GMM(sharp,self.numberCluster)
+        newDataFrame, centers = newGmm.result()
             
-        #print(newDataFrame)
+        print(newDataFrame)
         
             #print(diff)
             

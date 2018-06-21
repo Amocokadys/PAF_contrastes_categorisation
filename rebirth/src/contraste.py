@@ -48,7 +48,7 @@ class Contraste:
         return diff
         
     def contrast(self):
-        """ reapply kmean on each sharpens cluster """
+        """ reapply gmm on each sharpens cluster """
 
         newListDatas=[]
 
@@ -61,7 +61,7 @@ class Contraste:
         
         newGmm = gmm.GMM(newDataFrame,self.numberCluster)
         dataFrame, centers = newGmm.result()
-        clusterObject = clusterisation.Cluster(dataFrame,centers)
+        clusterObject = clusterisation.Clusterisation(dataFrame,centers)
         listeClusters = clusterObject.result()
         
         return listeClusters

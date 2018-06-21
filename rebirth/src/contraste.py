@@ -18,7 +18,7 @@ import clusterisation
 
 class Contraste:
     
-    def __init__(self,clustersList,critere=0.5,numberCluster=3):
+    def __init__(self,clustersList,critere=0.5,numberCluster=15):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
@@ -40,8 +40,6 @@ class Contraste:
         
         maxiListe = diff.max(axis=0)
         
-        print(maxiListe)
-        
         for k in diff.iterrows():
             for j in range(len(k[1])):
                 if(k[1][j]<self.critere*maxiListe[j]):
@@ -52,23 +50,24 @@ class Contraste:
     def contrast(self):
         """ reapply kmean on each sharpens cluster """
 
+        newListDatas=[]
+
         for cluster in self.clustersList:
             diff = self.difference(cluster)
             sharp = self.sharpening(diff)
-            #concaténer
-    
+            newListDatas.append(sharp)
+        newDataFrame=pd.concat(newListDatas) 
             
-            
-        #gmmsur tout 
-        #newGmm = gmm.GMM(sharp,self.numberCluster)
-        #newDataFrame, centers = newGmm.result()
-            
-        #print(newDataFrame)
         
-            #print(diff)
+        newGmm = gmm.GMM(newDataFrame,self.numberCluster)
+        dataFrame, centers = newGmm.result()
+        clusterObject = clusterisation.Cluster(dataFrame,centers)
+        listeClusters = clusterObject.result()
+        
+        return listeClusters
             
             
     def result(self):
         """ return the dataframe centré réduit sharpené """
-        self.contrast()
-        return self.clustersList
+        return self.contrast()
+        

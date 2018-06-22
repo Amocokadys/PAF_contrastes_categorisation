@@ -61,7 +61,7 @@ class Contraste:
         
         newGmm = gmm.GMM(newDataFrame,self.numberCluster)
         dataFrame, centers = newGmm.result()
-        clusterObject = clusterisation.Clusterisation(dataFrame,centers)
+        clusterObject = clusterisation.Clusterisation(dataFrame,centers, isContrast = True)
         listeClusters = clusterObject.result()
         
         return listeClusters

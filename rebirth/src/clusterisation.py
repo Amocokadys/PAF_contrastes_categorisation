@@ -9,10 +9,11 @@ class Clusterisation:
                   
     result (output) : -list of clusters"""
     
-    def __init__(self, dataframe, arrayCenters):
+    def __init__(self, dataframe, arrayCenters, isContrast = False):
         self.dataframe=dataframe
         self.arrayCenters=arrayCenters
-        
+        self.isContrast = isContrast
+
     def dataframeToCluster(self,dataframe,means):
         nb_clusters = len(means)
     
@@ -20,7 +21,7 @@ class Clusterisation:
         clusters=[]
         for i in range(nb_clusters):
             clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
-                                means[i])) # for each cluster, selects the points in the cluster
+                                    means[i], self.isContrast))# for each cluster, selects the points in the cluster
     
         return clusters
 
@@ -40,9 +41,8 @@ class Cluster:
     def __repr__(self):
         return (" dataframe: \n"+str(self.points)+"\n center:"+str(self.centre)+"\n label:"+str(self.label))
 
-    def __init__(self,points,centre):
-        """
-        if (len(points) == 2) :
+    def __init__(self,points,centre, isContrast):
+        """ if (len(points) == 2) :
             pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
             new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
             points = points.append(new_data)
@@ -51,7 +51,7 @@ class Cluster:
         self.points=points #un dataframe
         self.propDict={}
         self.label=[]
-        self.updateLabel()
+        self.updateLabel(isContrast)
         self.subClusters=None
         self.sharpedData = None
         
@@ -82,37 +82,39 @@ class Cluster:
         self.points = self.points.append(new_data)
 
 
-    def updatePropDict(self):
+    def updatePropDict(self, isContrast):
         """
         this method computes a dictionnary that contains the proportions of presence of 
         each label among the data of the cluster
         """
         self.propDict = {}
         for idx in self.points.index:
-            if '#' in idx:
+            print(idx)
+            if not isContrast:
                 lst_idx = [idx.split('#')[0]]
             else:
-                lst_idx = idx.split('~')[:-1]
+                lst_idx = idx.split('#')[1].split('~')[:-1]
             for i in lst_idx:
                 self.propDict[i] = 0
 
-        for row in  self.points.itertuples():
-            if '#' in idx:
+        for idx, row in  self.points.iterrows():
+            if not isContrast:
                 lst_idx = [idx.split('#')[0]]
             else:
-                lst_idx = idx.split('~')[:-1]
+                lst_idx = idx.split('#')[1].split('~')[:-1]
             for i in lst_idx:
                 self.propDict[i] += 1
 
         for key in self.propDict.keys():
             self.propDict[key] /= len(self.points)
 
-    def updateLabel(self):
+
+    def updateLabel(self, isContrast):
         """
         this method gets the major labels of the cluster by selecting only the ones that
         at least 50% of the cluster have
         """
-        self.updatePropDict()
+        self.updatePropDict(isContrast)
         for k in self.propDict.keys():
             if self.propDict[k] >= 0.5:
                 self.label.append(k)

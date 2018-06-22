@@ -36,7 +36,7 @@ class Contraste:
         
         
     def sharpening(self,diff):
-        """ sharps the dataframe in function a critere"""
+        """ sharpens the dataframe depending on a criteria """
         
         maxiListe = diff.max(axis=0)
         
@@ -58,8 +58,11 @@ class Contraste:
         #gmmsur tout 
         newGmm = gmm.GMM(sharp,self.numberCluster)
         newDataFrame, centers = newGmm.result()
-            
-        print(newDataFrame)
+       
+        clusterObject = clusterisation.Clusterisation(newDataFrame, centers)
+        listClusters = clusterObject.result()
+
+        return listClusters
         
             #print(diff)
             

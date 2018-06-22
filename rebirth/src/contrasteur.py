@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 
-def result(clustersCategories, clustersContrast, element ) :
+def result(clustersCategories, clustersContrast, element) :
     """ on attribue à element le cluster dont il est le plus proche du centre """
     distance_min = -1
     for cluster in clustersCategories :
@@ -46,7 +46,7 @@ def result(clustersCategories, clustersContrast, element ) :
 
 def assezProche(point, cluster):
     data = point - cluster.getCenter()
-    for k in range(len(element)):
+    for k in range(len(point)):
         if (abs(data[k])/sqrt(np.array(cluster.getDataFrame().var(axis=0))[k]) > 3):
             return False
     return True

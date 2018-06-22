@@ -67,11 +67,57 @@ class Ensemble:
 			somme += produit_mat[0][i]**2
 		return math.sqrt(somme) / self.nombre_descendant
 	
+	
+		
+	def cNew(self,feuille):
+		"""fonction de calcul de la complexite lors de la creation d'un nouveau cluster au niveau du noeud courant"""
+		c=0
+		nbDim=len(self.centre)
+		for fils in self.enfants:
+			c+=int(np.log2(1+Arbre.dico[fils.id]))
+			for i in range(nbDim):
+				c+=int(np.log2(1+abs((self.centre[i]*nbDim+feuille.centre[i])/(nbDim+1)-fils.centre[i])))
+			c+=fils.complex
+		cActuelle = 0
+		for i in range(nbDim):
+			cActuelle=int(np.log2(1+(feuille.centre[i]-self.centre[i])))
+		cActuelle+=np.log2(1+Arbre.nombreTotal)
+		return(c+cActuelle,[self.id])
+									
+	def cInsertion(self,feuille):
+		"""fonction recursive pour inserer une feuille dans un arbre en suivant la complexite de Jean-Louis"""
+		c,chemin=self.cNew(feuille)
+		for fils in noeud.enfants:
+			cActuel,cheminActuel=fils.cInsertion(feuille)
+			if cActuel<c:
+				chemin=cheminActuel
+				c=cActuel
+		chemin.append([self.id])
+		return c, chemin
+		
+		
+	def updateC(self):
+		c=0
+		nbDim=len(self.centre)
+		for fils in self.enfants:
+			c+=int(np.log2(1+Arbre.dico[fils.id]))
+			for i in range(nbDim):
+				c+=int(np.log2(1+abs(self.centre[i]-fils.centre[i])))
+			c+=fils.complex
+		self.complex = c
+		
+	def updateGlobal(self):
+		for fils in noeud.enfants:
+			self.complex=fils.updateGlobal()
+		self.updateC()
+	
 	def __add__(self, point):
 		
 		"""actualise l'espérence et la matrice de covariance
 		d'un cluster après l'ajout d'un point, en temps constant par 
-		rapport au nombre de points."""
+		rapport au nombre
+		de points."""
+		
 		
 		point = np.array(point)
 		self.matrice /= 1 + 1/self.nombre_descendant
@@ -89,6 +135,8 @@ class Ensemble:
 		
 		if self.points != None:
 			self.points.append(point)
+			
+		self.updateGlobal()
 		
 		return self
 	

@@ -43,7 +43,7 @@ class Contraste:
         
         for k in diff.iterrows():
             for j in range(len(k[1])):
-                if(k[1][j]<self.critere*maxiListe[j]):
+                if(abs(k[1][j])<self.critere*maxiListe[j]):
                     k[1][j]=0  
                 
         return diff
@@ -56,6 +56,24 @@ class Contraste:
                 if(j!=i):
                     k[1][j]=0
         return result
+        
+    def mini(self,dataframe,k):
+        minListe=dataframe.min(axis=0)
+        minimum =minListe[k]
+        
+        for j in dataframe.iterrows():
+            j[1][k]+=abs(minimum)
+            
+        return dataframe,minimum
+
+    def soustractMin(self,dataframe,minimum,k):
+        categories = dataframe['category']
+        del dataframe['category']
+        copy=dataframe.copy(deep=True)
+        result=copy-abs(minimum)
+        toReturn=self.putZeros(result,k)
+        toReturn['category']=categories
+        return toReturn
         
     def contrast(self):
         """ reapply gmm on each sharpens cluster """
@@ -73,9 +91,11 @@ class Contraste:
     
         for k in range(len(newDataFrame.columns)):    
             zeroDatas = self.putZeros(newDataFrame,k)
-            newGmm = gmm.GMM(zeroDatas,self.numberCluster)
+            miniFrame,minimum=self.mini(zeroDatas,k)
+            newGmm = gmm.GMM(miniFrame,self.numberCluster)
             dataFrame, centers = newGmm.result()
-            clusterObject = clusterisation.Clusterisation(dataFrame,centers)
+            lastDataFrame=self.soustractMin(dataFrame,minimum,k)
+            clusterObject = clusterisation.Clusterisation(lastDataFrame,centers)
             listeClusters = clusterObject.result()
             gmmList.append(listeClusters)
         

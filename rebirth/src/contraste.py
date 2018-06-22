@@ -18,7 +18,7 @@ import clusterisation
 
 class Contraste:
     
-    def __init__(self,clustersList,critere=0.5,numberCluster=15):
+    def __init__(self,clustersList,critere=0.2,numberCluster=15):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster

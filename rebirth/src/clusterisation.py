@@ -89,7 +89,6 @@ class Cluster:
         """
         self.propDict = {}
         for idx in self.points.index:
-            print(idx)
             if not isContrast:
                 lst_idx = [idx.split('#')[0]]
             else:
@@ -107,6 +106,9 @@ class Cluster:
 
         for key in self.propDict.keys():
             self.propDict[key] /= len(self.points)
+        
+        if isContrast:
+            print(self.propDict)
 
 
     def updateLabel(self, isContrast):
@@ -116,8 +118,9 @@ class Cluster:
         """
         self.updatePropDict(isContrast)
         for k in self.propDict.keys():
-            if self.propDict[k] >= 0.5:
-                self.label.append(k)
+            self.label.append(k)
+        if isContrast:
+            print(self.label)
         
         
         

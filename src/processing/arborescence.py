@@ -8,7 +8,8 @@ Created on Tue Jun 19 10:57:46 2018
 
 import math
 import numpy as np
-from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER
+from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG
+import subprocess
 
 def argmax_(liste,key=lambda x:x):
 	if len(liste) == 0:
@@ -30,22 +31,17 @@ def argmax_(liste,key=lambda x:x):
 class Feuille:
 	
 	""" classe correspondant à une donnée"""
-	
-	distribution = None
-	
-	def __init__(self, titre = "", point=None, distribution=None):
-		assert point != None or distribution != None
+		
+	def __init__(self, point, titre = ""):
 		self.titre = titre
-		self.distribution = distribution
-		if point != None:
-			for i in range(len(point)):
-				if distribution[i] == None:
-					if point[i] <= 0:
-						point[i] == np.inf
-					else:
-						point[i] = math.log(point[i]) * _RAPPORT_LOG
+		for i in range(len(point)):
+			if Arbre.distribution[i] == None:
+				if point[i] <= 0:
+					point[i] == np.inf
 				else:
-					point[i] /= distribution[i]
+					point[i] = math.log(point[i]) * _RAPPORT_LOG
+			else:
+				point[i] /= Arbre.distribution[i]
 		self.centre = point
 		
 	def feuille(self):
@@ -67,10 +63,8 @@ class Feuille:
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
-		if self.centre != None:
-			return Arbre([self, point], distribution=self.distribution)
-		else:
-			return Arbre([point], distribution=self.distribution)
+		return Arbre([self, point])
+
 	
 	def __str__(self):
 		return self.titre
@@ -78,18 +72,18 @@ class Feuille:
 class Arbre(Ensemble):
 			
 	nombre_instance = 0
+	distribution = None
 	
-	def __init__(self, enfants, pater=None, label=None, distribution=None):
-		assert distribution != None
+	def __init__(self, enfants, label=None):
 		self.enfants = enfants
-		descendants = self._private_liste_points()
-		
-		self.label = label
-		self.pater = pater
-		self.distribution = distribution
-		self.groupe = Ensemble.__init__(self, descendants, True)
-		self.actualise_enfants()
-		Arbre.nombre_instance += 1
+		if len(enfants) != 0:
+			
+			descendants = self._private_liste_points()
+			
+			self.label = label
+			self.groupe = Ensemble.__init__(self, descendants, True)
+			self.actualise_enfants()
+			Arbre.nombre_instance += 1
 		
 	def feuille(self):
 		return False
@@ -105,8 +99,8 @@ class Arbre(Ensemble):
 	def __add__(self, livre):
 		
 		""" ajout d'une donnée à l'arbre """
-		
-		livre.distribution = self.distribution
+		if len(self.enfants) == 0:
+			return Arbre([livre])
 		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))
 	
 		if min_distance.distance(livre) > _SEUIL_NOUVEAU_CLUSTER:
@@ -158,11 +152,37 @@ class Arbre(Ensemble):
 			else:
 				chaine += str(el)
 		return chaine + " ]"
+	
+	def dessin(self, chemin=""):
+		texte = ""
+		if chemin == "":
+			texte += "digraph G { " + self.dessin("r") + "}"
+			test = open("/tmp/bla.dot","w")
+			test.write(texte)
+			test.close()
+			pipe=subprocess.Popen(['dot','-Tpng', '/tmp/bla.dot'],stdout=subprocess.PIPE)
+			l=pipe.stdout.read()
+			pipe.wait()
+			pipe=subprocess.Popen(['display'],stdin=subprocess.PIPE)
+			pipe.stdin.write(l)
+			pipe.stdin.close()
+			
+			
+		else:
+			for idx, el in enumerate(self.enfants):
+				if el.feuille():
+					texte += "\"" + chemin + "\" -> \"" + el.titre + "\";"
+				else:
+					texte += "\"" + chemin + "\" -> \"" + chemin + str(idx) + "\";"
+					texte += el.dessin(chemin + str(idx))
+		return texte
+		
 """
-test = Feuille("racine")
+Arbre.distribution = [None, None, None]
+test = Arbre([])
 
-test += Feuille("abricot", [0,0,0])
-test += Feuille("pêche", [1,0,0])
-test += Feuille("poire",[0.001,0,0])
+test += Feuille([0,0,0], "abricot" )
+test += Feuille([1,0,0], "pêche", )
+test += Feuille([0.001,0,0], "poire")
 
-print(test)"""
+print(test.dessin())"""

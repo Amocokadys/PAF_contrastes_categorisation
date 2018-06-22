@@ -9,8 +9,8 @@ Created on Wed Jun 20 10:59:29 2018
 import math
 import numpy as np
 
-_CONSTANTE = 0.01
-_SEUIL_NOUVEAU_CLUSTER = 2
+_CONSTANTE = 0.5
+_SEUIL_NOUVEAU_CLUSTER = 3
 _RAPPORT_LOG = 1
 
 
@@ -60,9 +60,12 @@ class Ensemble:
 
 	def distance(self, point):
 		""" distance de Mahalanobis """
-		point_centre = point.centre - self.centre
-		return math.sqrt(np.dot(	np.dot(point_centre,np.linalg.inv(self.matrice)),\
-								np.transpose(point_centre)))
+		point_centre = np.array([point.centre - self.centre])
+		somme = 0
+		produit_mat = np.dot(point_centre,np.linalg.inv(self.matrice))
+		for i in range(self.dimension):
+			somme += produit_mat[0][i]**2
+		return math.sqrt(somme) / self.nombre_descendant
 	
 	def __add__(self, point):
 		

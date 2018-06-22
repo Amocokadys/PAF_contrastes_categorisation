@@ -130,9 +130,12 @@ class Ensemble:
 		self.complex = c
 		
 	def updateGlobal(self):
-		for fils in self.enfants:
-			self.complex=fils.updateGlobal()
-		self.updateC()
+		if self.feuille():
+			update.C
+		else :
+			for fils in self.enfants:
+				self.complex=fils.updateGlobal()
+			self.updateC()
 	
 	def __add__(self, point):
 		

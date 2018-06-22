@@ -11,6 +11,7 @@ import numpy as np
 
 _CONSTANTE = 0.01
 _SEUIL_NOUVEAU_CLUSTER = 2
+_RAPPORT_LOG = 1
 
 
 class Ensemble:

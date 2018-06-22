@@ -10,7 +10,6 @@ import math
 import numpy as np
 from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER
 
-
 def argmax_(liste,key=lambda x:x):
 	if len(liste) == 0:
 		assert "liste vide"
@@ -28,17 +27,27 @@ def argmax_(liste,key=lambda x:x):
 			idx = i
 			maximum = test
 
-
-
-
 class Feuille:
 	
 	""" classe correspondant à une donnée"""
 	
-	def __init__(self, titre, point = None):
-		self.titre = titre
-		self.centre = point
+	distribution = None
 	
+	def __init__(self, titre = "", point=None, distribution=None):
+		assert point != None or distribution != None
+		self.titre = titre
+		self.distribution = distribution
+		if point != None:
+			for i in range(len(point)):
+				if distribution[i] == None:
+					if point[i] <= 0:
+						point[i] == np.inf
+					else:
+						point[i] = math.log(point[i]) * _RAPPORT_LOG
+				else:
+					point[i] /= distribution[i]
+		self.centre = point
+		
 	def feuille(self):
 		return True
 	
@@ -54,14 +63,14 @@ class Feuille:
 		
 		somme = 0
 		for i in range(len(point.centre)):
-			somme += (point.centre[i] - self.centre[i])**2
+				somme += (point.centre[i] - self.centre[i])**2
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
 		if self.centre != None:
-			return Arbre([self, point])
+			return Arbre([self, point], distribution=self.distribution)
 		else:
-			return Arbre([point])
+			return Arbre([point], distribution=self.distribution)
 	
 	def __str__(self):
 		return self.titre
@@ -70,12 +79,14 @@ class Arbre(Ensemble):
 			
 	nombre_instance = 0
 	
-	def __init__(self, enfants, pater=None, label=None):
+	def __init__(self, enfants, pater=None, label=None, distribution=None):
+		assert distribution != None
 		self.enfants = enfants
 		descendants = self._private_liste_points()
 		
 		self.label = label
 		self.pater = pater
+		self.distribution = distribution
 		self.groupe = Ensemble.__init__(self, descendants, True)
 		self.actualise_enfants()
 		Arbre.nombre_instance += 1
@@ -95,6 +106,7 @@ class Arbre(Ensemble):
 		
 		""" ajout d'une donnée à l'arbre """
 		
+		livre.distribution = self.distribution
 		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))
 	
 		if min_distance.distance(livre) > _SEUIL_NOUVEAU_CLUSTER:

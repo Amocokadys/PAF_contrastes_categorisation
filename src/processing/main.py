@@ -1,12 +1,9 @@
 import cluster
 import contrastes
-import clean
 import gmm
 import pandas as pd
 from arborescence import Feuille, Arbre
 import numpy as np
-
-log_cancer = [True, True, True, True ]
 
 def traitement(data, number):
     print(data.index)
@@ -24,25 +21,32 @@ def contrast(data):
         contrast_data = contrast_data.append(diffs)
     return processed_data, traitement(contrast_data)
 
-	
-	data = pd.read_csv(chemin)
-	del data["ID"]
-	data.index = data["diagnosis"]
-	
-	racine = Feuille("racine")
-	i = 0
-	try:
-		for k, row in data.iterrows():
-			print("ajout de l'élément ",i)
-			racine += Feuille(row.values[0],np.array(row.values[1:], dtype=np.float32))
-			i += 1
+
+data = pd.read_csv("../../jeux de donne/breast_cancer/wdbc.csv")
+del data["ID"]
+data.index = data["diagnosis"]
+
+max_cancer = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
+
+""" 
+	max_cancer indique le comportement des différentes dimensions :
+	-  None   -> l'échelle logarithmique est plus pertinente
+	-  n > 0  -> l'échelle linéaire est plus pertinente, et les valeurs ne dépassent jamais n.
+	"""
+
+racine = Feuille(distribution = max_cancer)
+i = 0
+try:
+	for k, row in data.iterrows():
+		print("ajout de l'élément ",i)
+		racine += Feuille(row.values[0],np.array(row.values[1:], dtype=np.float32))
+		i += 1
 	print(racine)
-	except KeyboardInterrupt:
-		print(racine)
+except KeyboardInterrupt:
+	print(racine)
 	
 	
 
-test_version_inclémentale("../../jeux de donne/breast_cancer/wdbc.csv")
 		
 """
 if __name__ == "__main__":

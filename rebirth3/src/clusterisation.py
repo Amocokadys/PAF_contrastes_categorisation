@@ -117,7 +117,29 @@ class Cluster:
             if self.propDict[k] >= 0.5:
                 self.label.append(k)
         
+class ContrastCluster(Cluster):
+    def __init__(self,points,centre,dimension):
+        self.centre=centre
+        self.points=points #un dataframe
+        self.propDict = {'=':0, '+':0, '-':0}
+        self.label=[]
+        self.updateLabel()
+        self.subClusters=None
+        self.sharpedData = None
+        self.dim=dimension
         
+    def updatePropDict(self):
+        s = self.points[self.dim]
+        for idx, val in s.iteritems():
+            if val == 0:
+                self.propDict['=']+=1
+            elif val < 0:
+                self.propDict['-']+=1
+            else:
+                self.propDict['+']+=1
+
+    def updateLabel(self):
+        self.label = max(self.propDict, key = self.propDict.get)
         
         
 class SubCluster(Cluster):

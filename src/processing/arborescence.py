@@ -10,6 +10,10 @@ import math
 import numpy as np
 from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER
 
+alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+
 def argmax_(liste,key=lambda x:x):
 	if len(liste) == 0:
 		assert "liste vide"
@@ -30,20 +34,15 @@ def argmax_(liste,key=lambda x:x):
 class Feuille:
 	
 	""" classe correspondant à une donnée"""
-	
-	distribution = None
-	
-	def __init__(self, titre = "", point=None, distribution=None):
-		assert point != None or distribution != None
+		
+	def __init__(self, point, titre = ""):
+		Arbre.nombreTotal += 1
 		self.titre = titre
-		self.distribution = distribution
-		if point != None:
-			for i in range(len(point)):
-				if distribution[i] == None:
-					if point[i] <= 0:
-						point[i] == np.inf
-					else:
-						point[i] = math.log(point[i]) * _RAPPORT_LOG
+		self.code = ""
+		for i in range(len(point)):
+			if Arbre.distribution[i] == None:
+				if point[i] <= 0:
+					point[i] == np.inf
 				else:
 					point[i] /= distribution[i]
 		self.centre = point
@@ -67,10 +66,8 @@ class Feuille:
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
-		if self.centre != None:
-			return Arbre([self, point], distribution=self.distribution)
-		else:
-			return Arbre([point], distribution=self.distribution)
+		return Arbre([self, point], point.code)
+
 	
 	def __str__(self):
 		return self.titre
@@ -78,18 +75,24 @@ class Feuille:
 class Arbre(Ensemble):
 			
 	nombre_instance = 0
+	distribution = None
+	nombreTotal = 0
+	dico = dict()
 	
 	def __init__(self, enfants, pater=None, label=None, distribution=None):
 		assert distribution != None
 		self.enfants = enfants
-		descendants = self._private_liste_points()
-		
+
 		self.label = label
-		self.pater = pater
-		self.distribution = distribution
-		self.groupe = Ensemble.__init__(self, descendants, True)
-		self.actualise_enfants()
-		Arbre.nombre_instance += 1
+		self.dico[label] = (len(enfants), -1)
+		if len(enfants) != 0:
+			
+			descendants = self._private_liste_points()
+			
+			
+			self.groupe = Ensemble.__init__(self, descendants, True)
+			self.actualise_enfants()
+			Arbre.nombre_instance += 1
 		
 	def feuille(self):
 		return False
@@ -105,8 +108,9 @@ class Arbre(Ensemble):
 	def __add__(self, livre):
 		
 		""" ajout d'une donnée à l'arbre """
-		
-		livre.distribution = self.distribution
+
+		if len(self.enfants) == 0:
+			return Arbre([livre], self.label)
 		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))
 	
 		if min_distance.distance(livre) > _SEUIL_NOUVEAU_CLUSTER:
@@ -125,6 +129,8 @@ class Arbre(Ensemble):
 		
 		else:
 			
+			if self.enfants[min_enfant].feuille():
+				livre.code += self.label + alphabet[min_enfant]
 			self.enfants[min_enfant] += livre
 			Ensemble.__add__(self, livre.centre)
 		return self
@@ -158,8 +164,35 @@ class Arbre(Ensemble):
 			else:
 				chaine += str(el)
 		return chaine + " ]"
+
+	
+	def dessin(self, final = True):
+		texte = ""
+		if final:
+			texte += "digraph G { " + self.dessin(False) + "}"
+			test = open("/tmp/bla.dot","w")
+			test.write(texte)
+			test.close()
+			pipe=subprocess.Popen(['dot','-Tpng', '/tmp/bla.dot'],stdout=subprocess.PIPE)
+			l=pipe.stdout.read()
+			pipe.wait()
+			pipe=subprocess.Popen(['display'],stdin=subprocess.PIPE)
+			pipe.stdin.write(l)
+			pipe.stdin.close()
+			
+			
+		else:
+			for idx, el in enumerate(self.enfants):
+				if el.feuille():
+					texte += "\"" + self.label + "\" -> \"" + el.titre + "\";"
+				else:
+					texte += "\"" + self.label + "\" -> \"" + el.label + "\";"
+					texte += el.dessin(False)
+		return texte
+		
 """
-test = Feuille("racine")
+Arbre.distribution = [None, None, None]
+test = Arbre([], "~")
 
 test += Feuille("abricot", [0,0,0])
 test += Feuille("pêche", [1,0,0])

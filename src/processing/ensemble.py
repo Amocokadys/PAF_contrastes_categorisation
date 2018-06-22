@@ -139,3 +139,16 @@ class Ensemble:
 	
 	def __iter__(self):
 		return iter(self.points)
+
+
+class Dictionnaire(dict):
+	
+	def __init__(self):
+		dict.__init__(self)
+	
+	def __add__(self, clef):
+		dict.__new__(self, el)
+	
+	
+	
+	

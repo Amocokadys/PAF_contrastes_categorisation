@@ -26,7 +26,7 @@ data = pd.read_csv("../../jeux de donne/breast_cancer/wdbc.csv")
 del data["ID"]
 data.index = data["diagnosis"]
 
-max_cancer = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
+Arbre.distribution
 
 """ 
 	max_cancer indique le comportement des différentes dimensions :
@@ -34,7 +34,8 @@ max_cancer = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
 	-  n > 0  -> l'échelle linéaire est plus pertinente, et les valeurs ne dépassent jamais n.
 	"""
 
-racine = Feuille(distribution = max_cancer)
+
+racine = Arbre([], "~")
 i = 0
 try:
 	for k, row in data.iterrows():

@@ -26,7 +26,7 @@ data = pd.read_csv("../../jeux de donne/breast_cancer/wdbc.csv")
 del data["ID"]
 data.index = data["diagnosis"]
 
-Arbre.distribution
+Arbre.distribution = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
 
 """ 
 	max_cancer indique le comportement des différentes dimensions :
@@ -40,7 +40,7 @@ i = 0
 try:
 	for k, row in data.iterrows():
 		print("ajout de l'élément ",i)
-		racine += Feuille(row.values[0],np.array(row.values[1:], dtype=np.float32))
+		racine += Feuille(np.array(row.values[1:], dtype=np.float32), row.values[0])
 		i += 1
 	print(racine)
 except KeyboardInterrupt:

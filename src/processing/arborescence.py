@@ -8,7 +8,8 @@ Created on Tue Jun 19 10:57:46 2018
 
 import math
 import numpy as np
-from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER
+import subprocess
+from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, Dictionnaire, _RAPPORT_LOG
 
 alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -44,7 +45,9 @@ class Feuille:
 				if point[i] <= 0:
 					point[i] == np.inf
 				else:
-					point[i] /= distribution[i]
+					point[i] = math.log(point[i]) * _RAPPORT_LOG
+			else:
+				point[i] /= Arbre.distribution[i]
 		self.centre = point
 		
 	def feuille(self):
@@ -66,6 +69,7 @@ class Feuille:
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
+		Arbre.dico.ajout(point.code, 2)
 		return Arbre([self, point], point.code)
 
 	
@@ -77,14 +81,13 @@ class Arbre(Ensemble):
 	nombre_instance = 0
 	distribution = None
 	nombreTotal = 0
-	dico = dict()
 	
-	def __init__(self, enfants, pater=None, label=None, distribution=None):
-		assert distribution != None
+	
+	def __init__(self, enfants, label):
 		self.enfants = enfants
 
 		self.label = label
-		self.dico[label] = (len(enfants), -1)
+		Ensemble.dico.ajout(label,len(enfants))
 		if len(enfants) != 0:
 			
 			descendants = self._private_liste_points()
@@ -109,6 +112,7 @@ class Arbre(Ensemble):
 		
 		""" ajout d'une donnée à l'arbre """
 
+		Ensemble.dico.plus_un(self.label)
 		if len(self.enfants) == 0:
 			return Arbre([livre], self.label)
 		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))

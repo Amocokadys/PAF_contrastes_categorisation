@@ -13,10 +13,36 @@ _CONSTANTE = 0.01
 _SEUIL_NOUVEAU_CLUSTER = 2
 _RAPPORT_LOG = 1
 
+class Dictionnaire():
+	
+	def __init__(self):
+		self.liste = []
+	
+	def plus_un(self, code):
+		for i in range(len(self.liste)):
+			if code == self.liste[i][0]:
+				self.liste[i] = (self.liste[i][0], self.liste[i][1] + 1)
+				self.liste.sort(key=lambda x:-x[1])
+				return 
+		print(code + " non trouvé")
+		assert False
+		
+	
+	def __getitem__(self, code):
+		for i in range(len(self.liste)):
+			if code == self.liste[i][0]:
+				return i
+		return -1
+	
+	def ajout(self, code, nombre):
+		self.liste.append((code,nombre))
+		self.liste.sort(key=lambda x:-x[1])
 
 class Ensemble:
 	
 	"""classe gérant une liste de vecteurs, et calculant leur espérance / matrice de covariance"""
+	
+	dico = Dictionnaire()
 	
 	def __init__(self, points, mode_incr = False):
 		
@@ -71,20 +97,20 @@ class Ensemble:
 		c=0
 		nbDim=len(self.centre)
 		for fils in self.enfants:
-			c+=int(np.log2(1+Arbre.dico[fils.id]))
+			c+=int(np.log2(1+Ensemble.dico[fils.id]))
 			for i in range(nbDim):
 				c+=int(np.log2(1+abs((self.centre[i]*nbDim+feuille.centre[i])/(nbDim+1)-fils.centre[i])))
 			c+=fils.complex
 		cActuelle = 0
 		for i in range(nbDim):
 			cActuelle=int(np.log2(1+(feuille.centre[i]-self.centre[i])))
-		cActuelle+=np.log2(1+Arbre.nombreTotal)
+		cActuelle+=np.log2(1+Ensemble.nombreTotal)
 		return(c+cActuelle,[self.id])
 									
 	def cInsertion(self,feuille):
 		"""fonction recursive pour inserer une feuille dans un arbre en suivant la complexite de Jean-Louis"""
 		c,chemin=self.cNew(feuille)
-		for fils in noeud.enfants:
+		for fils in self.enfants:
 			cActuel,cheminActuel=fils.cInsertion(feuille)
 			if cActuel<c:
 				chemin=cheminActuel
@@ -97,14 +123,14 @@ class Ensemble:
 		c=0
 		nbDim=len(self.centre)
 		for fils in self.enfants:
-			c+=int(np.log2(1+Arbre.dico[fils.id]))
+			c+=int(np.log2(1+Ensemble.dico[fils.id]))
 			for i in range(nbDim):
 				c+=int(np.log2(1+abs(self.centre[i]-fils.centre[i])))
 			c+=fils.complex
 		self.complex = c
 		
 	def updateGlobal(self):
-		for fils in noeud.enfants:
+		for fils in self.enfants:
 			self.complex=fils.updateGlobal()
 		self.updateC()
 	
@@ -141,14 +167,6 @@ class Ensemble:
 		return iter(self.points)
 
 
-class Dictionnaire(dict):
-	
-	def __init__(self):
-		dict.__init__(self)
-	
-	def __add__(self, clef):
-		dict.__new__(self, el)
-	
-	
+
 	
 	

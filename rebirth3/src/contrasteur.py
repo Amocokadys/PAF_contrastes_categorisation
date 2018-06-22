@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 21 10:32:13 2018
+Created on Fri Jun 22 11:56:53 2018
 
 @author: antoine
 
 On prend en entrée une liste d'objets cluster (comportant un dataframe, un vecteur centre,
-un label) catégorisation ; et une liste d'objets clusters contraste
+un label) catégorisation ; et une liste par dimension de listes de 3 objets clusters contraste
 On prend également un nouvel élément en entrée (un array numpy)
 
-On ressort un array contenant la catégorie et une liste d'adjectifs correspondant à l'élément
+On ressort un array contenant la catégorie et pour chaque dimension une information '+', '6' ou ''
 """
 
 import numpy as np
 import pandas as pd
 from math import sqrt
 
-def result(clustersCategories, clustersContrast, element ) :
+def result(clustersCategories, listClustersContrast, element) :
     """ on attribue à element le cluster dont il est le plus proche du centre """
     distance_min = -1
     for cluster in clustersCategories :
@@ -27,29 +27,33 @@ def result(clustersCategories, clustersContrast, element ) :
     
     label = cluster_category.getLabel() 
     
-    """ on attribue à element la liste de labels associé au cluster de contrastes
-    dans lequel il se trouve s'il en est assez proche en nombre d'écarts-types """
-
-    adjectifs = "pas d'adjectif pertinent trouvé"
-    distance_min = -1
-    for cluster in clustersContrast :
-        distance_tmp = distanceEuclidienne(cluster.centre, element)
-        """ si une des composantes de la différence entre element et le centre du cluster
-            dépasse 3 variances, alors la condition n'est pas remplie """
-        if (distance_tmp < distance_min or (distance_min < 0 and assezProche(element, cluster))) :
-            distance_min = distance_tmp
-            cluster_contrast = cluster
+    """ on attribue à element une liste de caractéristiques ('longueur +') pour chaque dimension
+        il faut déterminer pour chaque dimension de quel cluster element est le plus proche """
     
-    adjectifs = cluster_contrast.getLabel()
+    contraste = []
     
-    return label, adjectifs
+    for k in range(listClustersContrast):
+        distance_min = -1
+        for cluster in listClustersContrast[k] :
+            distance_tmp = distanceEuclidienne(cluster.centre, element[k])
+            """ 3 clusters : normal, petit ou grand
+                la dimension est celle de la colonne du dataframe non nulle """
+            if (distance_tmp < distance_min or distance_min < 0):
+                distance_min = distance_tmp
+                cluster_contrast = cluster
+    
+        dimension = dimensionNonNulle(cluster_contrast.getDataFrame())
+        caracteristique = cluster_contrast.getLabel()
+        contraste.append(dimension + " " + caracteristique)
+    
+    return label, contraste
 
-def assezProche(point, cluster):
-    data = point - cluster.getCenter()
-    for k in range(len(element)):
-        if (abs(data[k])/sqrt(np.array(cluster.getDataFrame().var(axis=0))[k]) > 3):
-            return False
-    return True
+""" on renvoie la dimension associée à la première colonne dont on rencontre une valeur non nulle """
+def dimensionNonNulle(dataframe):
+    for dimension in dataframe.columns:
+        for k in range(len(dataframe.index)):
+            if dataframe[dimension][k] != 0:
+                return dimension
 
 def distanceEuclidienne(point_1, point_2):
     distance = 0
@@ -58,12 +62,11 @@ def distanceEuclidienne(point_1, point_2):
     return distance
 
 if __name__ == "__main__":
-    ar = np.array([[1.1, 2, 3.3, 4], [2.7, 10, 5.4, 7], [5.3, 9, 1.5, 15]])
+    #ar = np.array([[1.1, 2, 3.3, 4], [2.7, 10, 5.4, 7], [5.3, 9, 1.5, 15]])
+    ar = np.array([[0.1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
     df = pd.DataFrame(ar, index = ['a1', 'a2', 'a3'], columns = ['A', 'B', 'C', 'D'])
 
     element = np.array([3, 5, 3.5, 8])
     center = np.array([3.03, 7, 3.4, 8.67])
 
-    for k in range(len(element)):
-        if ((abs(element[k] - center[k]))/sqrt(np.array(df.var(axis=0))[k]) > 3):
-            print((abs(element[k] - center[k]))/sqrt(np.array(df.var(axis=0))[k]))
+    print(dimensionNonNulle(df))

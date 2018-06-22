@@ -32,10 +32,10 @@ def result(clustersCategories, listClustersContrast, element) :
     
     contraste = []
     
-    for k in range(listClustersContrast):
+    for k in range(len(listClustersContrast)):
         distance_min = -1
         for cluster in listClustersContrast[k] :
-            distance_tmp = distanceEuclidienne(cluster.centre, element[k])
+            distance_tmp = (cluster.centre[k] - element[k])**2
             """ 3 clusters : normal, petit ou grand
                 la dimension est celle de la colonne du dataframe non nulle """
             if (distance_tmp < distance_min or distance_min < 0):
@@ -50,10 +50,11 @@ def result(clustersCategories, listClustersContrast, element) :
 
 """ on renvoie la dimension associée à la première colonne dont on rencontre une valeur non nulle """
 def dimensionNonNulle(dataframe):
-    for dimension in dataframe.columns:
-        for k in range(len(dataframe.index)):
-            if dataframe[dimension][k] != 0:
-                return dimension
+    for i, row in dataframe.iterrows():
+        for dim in dataframe.columns:
+            if row[dim] != 0:
+                return dim
+
 
 def distanceEuclidienne(point_1, point_2):
     distance = 0

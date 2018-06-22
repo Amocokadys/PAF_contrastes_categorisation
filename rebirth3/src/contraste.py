@@ -19,7 +19,7 @@ import clusterisation
 
 class Contraste:
     
-    def __init__(self,clustersList,critere=m.pow(10,-16),numberCluster=3):
+    def __init__(self,clustersList,critere=0.2,numberCluster=3):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
@@ -43,7 +43,7 @@ class Contraste:
         
         for k in diff.iterrows():
             for j in range(len(k[1])):
-                if(k[1][j]<self.critere*maxiListe[j]):
+                if(abs(k[1][j])<self.critere*maxiListe[j]):
                     k[1][j]=0  
                 
         return diff
@@ -75,7 +75,7 @@ class Contraste:
             zeroDatas = self.putZeros(newDataFrame,k)
             newGmm = gmm.GMM(zeroDatas,self.numberCluster)
             dataFrame, centers = newGmm.result()
-            clusterObject = clusterisation.Clusterisation(dataFrame,centers)
+            clusterObject = clusterisation.Clusterisation(dataFrame,centers, isContrast = True, dimension = dataFrame.columns[k])
             listeClusters = clusterObject.result()
             gmmList.append(listeClusters)
         

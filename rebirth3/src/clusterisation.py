@@ -9,9 +9,11 @@ class Clusterisation:
                   
     result (output) : -list of clusters"""
     
-    def __init__(self, dataframe, arrayCenters):
+    def __init__(self, dataframe, arrayCenters, isContrast = False, dimension = None):
         self.dataframe=dataframe
         self.arrayCenters=arrayCenters
+        self.isContrast = isContrast
+        self.dimension = dimension
         
     def dataframeToCluster(self,dataframe,means):
         nb_clusters = len(means)
@@ -19,8 +21,13 @@ class Clusterisation:
         # get clusters from data
         clusters=[]
         for i in range(nb_clusters):
-            clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
-                                means[i])) # for each cluster, selects the points in the cluster
+            if self.isContrast:
+                clusters.append(ContrastCluster(dataframe.loc[dataframe['category']==i],\
+                                       means[i], self.dimension)) # for each cluster, selects the points in the cluster
+
+            else:
+                clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
+                                        means[i])) # for each cluster, selects the points in the cluster
     
         return clusters
 
@@ -123,10 +130,10 @@ class ContrastCluster(Cluster):
         self.points=points #un dataframe
         self.propDict = {'=':0, '+':0, '-':0}
         self.label=[]
-        self.updateLabel()
         self.subClusters=None
         self.sharpedData = None
         self.dim=dimension
+        self.updateLabel()
         
     def updatePropDict(self):
         s = self.points[self.dim]
@@ -139,7 +146,10 @@ class ContrastCluster(Cluster):
                 self.propDict['+']+=1
 
     def updateLabel(self):
+        self.updatePropDict()
         self.label = max(self.propDict, key = self.propDict.get)
+        print(self.label)
+        print(self.propDict)
         
         
 class SubCluster(Cluster):

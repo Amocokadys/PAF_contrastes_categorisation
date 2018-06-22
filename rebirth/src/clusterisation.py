@@ -54,6 +54,7 @@ class Cluster:
         self.updateLabel(isContrast)
         self.subClusters=None
         self.sharpedData = None
+        if isContrast: print(self.centre)
         
     def setSubClusters(self,clusters):
         self.subClusters=clusters
@@ -119,9 +120,6 @@ class Cluster:
         self.updatePropDict(isContrast)
         for k in self.propDict.keys():
             self.label.append(k)
-        if isContrast:
-            print(self.label)
-        
         
         
         

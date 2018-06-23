@@ -26,7 +26,7 @@ data = pd.read_csv("../../jeux de donne/breast_cancer/wdbc.csv")
 del data["ID"]
 data.index = data["diagnosis"]
 
-Arbre.distribution = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
+Ensemble.distribution = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
 
 """ 
 	Arbre.distribution indique le comportement des différentes dimensions :

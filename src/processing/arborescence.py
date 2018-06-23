@@ -8,7 +8,7 @@ Created on Tue Jun 19 10:57:46 2018
 
 import math
 import numpy as np
-from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Ordinal
+from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Transfini
 import subprocess
 
 def argmax_(liste,key=lambda x:x):
@@ -28,14 +28,14 @@ def argmax_(liste,key=lambda x:x):
 			idx = i
 			maximum = test
 
-class Feuille:
+class Feuille(Ensemble):
 	
 	""" classe correspondant à une donnée"""
 		
 	def __init__(self, point, titre = ""):
 		self.titre = titre
-		point[i] /= Arbre.distribution[i]
-		self.centre = point
+		point[i] /= Ensemble.distribution[i]
+		Ensemble.__init__(self,point)
 		
 	def feuille(self):
 		return True
@@ -43,26 +43,8 @@ class Feuille:
 	def __iter__(self):
 		return iter(self.centre)
 	
-	def __getitem__(self, clef):
-		return self.centre[clef]
-	
-	def distance(self, point):
-				
-		somme = Ordinal()
-		for clef in self.centre:
-			if clef in point.centre:
-				if Arbre.distribution[clef] == None:
-					if self[clef] == 0 or point[clef] == 0:
-						somme += Ordinal(0,1)
-					else:
-						somme += math.abs(math.log(self[clef] / point[clef]))
-				else:
-					somme += (point[clef] - self[clef]) / Arbre.distribution[clef]
-		return somme
-	
 	def __add__(self, point):
 		return Arbre([self, point])
-
 	
 	def __str__(self):
 		return self.titre
@@ -70,7 +52,6 @@ class Feuille:
 class Arbre(Ensemble):
 			
 	nombre_instance = 0
-	distribution = {}
 	
 	def __init__(self, enfants, label=None):
 		self.enfants = enfants
@@ -88,8 +69,7 @@ class Arbre(Ensemble):
 	
 	def actualise_enfants(self):
 		
-		""" crée et actualise une espérance/matrice de covariance correspondant
-		aux centres des noeuds enfants"""
+		""" crée et actualise une espérance aux centres des noeuds enfants"""
 		
 		centres = [el.centre for el in self.enfants]
 		self.matrice_enfants = Ensemble(centres, False)

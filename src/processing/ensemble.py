@@ -13,6 +13,43 @@ _CONSTANTE = 0.5
 _SEUIL_NOUVEAU_CLUSTER = 3
 _RAPPORT_LOG = 1
 
+class Ordinal:
+	
+	def __init__(self, n = 0, w = 0):
+		self.n = n
+		self.w = w
+	
+	def __gt__(self, autre):
+		return (self.w > autre.w) or (self.w == autre.w and self.n > autre.n)
+	
+	def __ge__(self, autre):
+		return (self.w >= autre.w) or (self.w == autre.w and self.n >= autre.n)
+	
+	def __lt__(self, autre):
+		return (self.w < autre.w) or (self.w == autre.w and self.n < autre.n)
+	
+	def __le__(self, autre):
+		return (self.w <= autre.w) or (self.w == autre.w and self.n <= autre.n)
+	
+	def __eq__(self, autre):
+		return self.n == autre.n and self.w == autre.w
+	
+	def _neq__(self, autre):
+		return self.n != autre.n or self.w != autre.w
+	
+	def __add__(self,autre):
+		if type(autre) == Ordinal:
+			return Ordinal(autre.n, autre.w + self.w)
+		else:
+			return Ordinal(autre + self.n, self.w)
+	
+	def __sub__(self, autre):
+		if self.w < autre.w:
+			raise ArithmeticError
+		elif self.n < autre.n:
+			return Ordinal(0,self.w - autre.w)
+		else:
+			return Ordinal(self.n - autre.n, self.w - autre.w)
 
 class Ensemble:
 	

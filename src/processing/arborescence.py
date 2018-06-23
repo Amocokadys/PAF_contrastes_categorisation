@@ -8,7 +8,7 @@ Created on Tue Jun 19 10:57:46 2018
 
 import math
 import numpy as np
-from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG
+from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Ordinal
 import subprocess
 
 def argmax_(liste,key=lambda x:x):
@@ -34,14 +34,7 @@ class Feuille:
 		
 	def __init__(self, point, titre = ""):
 		self.titre = titre
-		for i in range(len(point)):
-			if Arbre.distribution[i] == None:
-				if point[i] <= 0:
-					point[i] == np.inf
-				else:
-					point[i] = math.log(point[i]) * _RAPPORT_LOG
-			else:
-				point[i] /= Arbre.distribution[i]
+		point[i] /= Arbre.distribution[i]
 		self.centre = point
 		
 	def feuille(self):
@@ -50,17 +43,22 @@ class Feuille:
 	def __iter__(self):
 		return iter(self.centre)
 	
-	def matrice(self):
-		return np.eye(len(self.centre)) * _CONSTANTE
+	def __getitem__(self, clef):
+		return self.centre[clef]
 	
 	def distance(self, point):
-		
-		""" distance euclidienne """
-		
-		somme = 0
-		for i in range(len(point.centre)):
-				somme += (point.centre[i] - self.centre[i])**2
-		return math.sqrt(somme) / _CONSTANTE
+				
+		somme = Ordinal()
+		for clef in self.centre:
+			if clef in point.centre:
+				if Arbre.distribution[clef] == None:
+					if self[clef] == 0 or point[clef] == 0:
+						somme += Ordinal(0,1)
+					else:
+						somme += math.abs(math.log(self[clef] / point[clef]))
+				else:
+					somme += (point[clef] - self[clef]) / Arbre.distribution[clef]
+		return somme
 	
 	def __add__(self, point):
 		return Arbre([self, point])
@@ -72,7 +70,7 @@ class Feuille:
 class Arbre(Ensemble):
 			
 	nombre_instance = 0
-	distribution = None
+	distribution = {}
 	
 	def __init__(self, enfants, label=None):
 		self.enfants = enfants

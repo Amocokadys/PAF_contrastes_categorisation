@@ -49,6 +49,7 @@ class Feuille:
 			else:
 				point[i] /= Arbre.distribution[i]
 		self.centre = point
+		Ensemble.dico.ajout(titre,1)
 		
 	def feuille(self):
 		return True
@@ -69,8 +70,11 @@ class Feuille:
 		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
-		Arbre.dico.ajout(point.code, 2)
 		return Arbre([self, point], point.code)
+    
+	def updateC(self):
+		self.complex = int(np.log2(1+Ensemble.dico[self.titre]))
+
 
 	
 	def __str__(self):
@@ -107,36 +111,27 @@ class Arbre(Ensemble):
 		
 		centres = [el.centre for el in self.enfants]
 		self.matrice_enfants = Ensemble(centres, False)
+        
+    
+	def cInsertion(self,feuille):
+		"""fonction recursive pour inserer une feuille dans un arbre en suivant la complexite de Jean-Louis"""
+		c,chemin=self.cNew(feuille)
+		for fils in self.enfants:
+			cActuel,cheminActuel=fils.cInsertion(feuille)
+			if cActuel<c:
+				chemin=cheminActuel
+				c=cActuel
+		chemin.append([self.id])
+		return c, chemin
 	
 	def __add__(self, livre):
 		
 		""" ajout d'une donnée à l'arbre """
 
 		Ensemble.dico.plus_un(self.label)
-		if len(self.enfants) == 0:
-			return Arbre([livre], self.label)
-		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))
-	
-		if min_distance.distance(livre) > _SEUIL_NOUVEAU_CLUSTER:
-			
-			try:
-				livre.feuille()
-				self.enfants.append(livre)
-			except AttributeError:
-				self.enfants += livre
-			
-			Ensemble.__add__(self,livre.centre)
-			self.matrice_enfants.points.append(livre.centre)
-			self.matrice_enfants.actualise()
-			
-			self.regroupement()
-		
-		else:
-			
-			if self.enfants[min_enfant].feuille():
-				livre.code += self.label + alphabet[min_enfant]
-			self.enfants[min_enfant] += livre
-			Ensemble.__add__(self, livre.centre)
+        
+		self.cInsertion(livre)
+        
 		return self
 					
 		

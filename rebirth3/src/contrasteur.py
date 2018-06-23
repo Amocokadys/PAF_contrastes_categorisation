@@ -59,7 +59,7 @@ def dimensionNonNulle(dataframe):
 
 def distanceEuclidienne(point_1, point_2):
     distance = 0
-    for k in range(len(point_1)):
+    for k in range(min(len(point_1),len(point_2))):
         distance += (point_1[k] - point_2[k])**2
     return distance
 

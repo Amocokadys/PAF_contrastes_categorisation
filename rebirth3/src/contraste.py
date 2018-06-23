@@ -29,7 +29,7 @@ class Contraste:
         dataframe = cluster.getDataFrame()
         del dataframe['category']
         center = cluster.getCenter()
-        diff = (dataframe-center)/self.variance(dataframe)
+        diff = (dataframe-center[:len(dataframe.columns)])/self.variance(dataframe)
         return diff
              
     def variance(self,dataFrame):

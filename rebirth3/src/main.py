@@ -11,7 +11,7 @@ def clusters_from_dataframe(df, ncluster):
     input : df the dataframe from whom infer the clusters
     input : ncluster the number of clusters to separate
     """
-    mgmm = gmm.GMM(df, ncluster)
+    mgmm = gmm.GMM(df)
     clusters, centres = mgmm.result()
     mclusters = clusterisation.Clusterisation(clusters, centres)
     return mclusters.result()

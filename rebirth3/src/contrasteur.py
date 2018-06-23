@@ -34,17 +34,18 @@ def result(clustersCategories, listClustersContrast, element) :
     
     for k in range(len(listClustersContrast)):
         distance_min = -1
-        for cluster in listClustersContrast[k] :
+        for j in range(len(listClustersContrast[k])):
+            cluster = listClustersContrast[k][j]
             distance_tmp = (cluster.centre[k] - element[k])**2
             """ 3 clusters : normal, petit ou grand
                 la dimension est celle de la colonne du dataframe non nulle """
             if (distance_tmp < distance_min or distance_min < 0):
                 distance_min = distance_tmp
                 cluster_contrast = cluster
+                dimension = cluster.points.columns[k]
     
-        dimension = dimensionNonNulle(cluster_contrast.getDataFrame())
         caracteristique = cluster_contrast.getLabel()
-        contraste.append(dimension + " " + caracteristique)
+        contraste.append(dimension + " " + "".join(caracteristique))
     
     return label, contraste
 

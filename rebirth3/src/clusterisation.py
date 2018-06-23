@@ -147,11 +147,9 @@ class ContrastCluster(Cluster):
 
     def updateLabel(self):
         self.updatePropDict()
-        self.label = max(self.propDict, key = self.propDict.get)
-        print(self.label)
-        print(self.propDict)
+        self.label.append(max(self.propDict, key = self.propDict.get))
         
-        
+
 class SubCluster(Cluster):
     """To use the subclusters, herites from Cluster"""
     

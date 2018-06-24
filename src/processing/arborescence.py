@@ -34,7 +34,6 @@ class Feuille(Ensemble):
 		
 	def __init__(self, point, titre = ""):
 		self.titre = titre
-		point[i] /= Ensemble.distribution[i]
 		Ensemble.__init__(self,point)
 		
 	def feuille(self):
@@ -55,24 +54,22 @@ class Arbre(Ensemble):
 	
 	def __init__(self, enfants, label=None):
 		self.enfants = enfants
-		if len(enfants) != 0:
+		
+		if len(enfants) >= 2:
 			
-			descendants = self._private_liste_points()
+			self.variance = enfants[0].distance(enfants[1]) / 2
 			
-			self.label = label
-			self.groupe = Ensemble.__init__(self, descendants, True)
-			self.actualise_enfants()
+			
 			Arbre.nombre_instance += 1
 		
 	def feuille(self):
 		return False
 	
-	def actualise_enfants(self):
-		
-		""" crée et actualise une espérance aux centres des noeuds enfants"""
-		
-		centres = [el.centre for el in self.enfants]
-		self.matrice_enfants = Ensemble(centres, False)
+	def variance(self):
+		max_distance = 0
+		for i in range(len(self.enfants)):
+			for j in range(i+1, len(self.enfants)):
+				dist = self
 	
 	def __add__(self, livre):
 		

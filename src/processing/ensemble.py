@@ -44,6 +44,14 @@ class Transfini:
 		else:
 			return Transfini(autre + self.n, self.w, self.z)
 	
+	def __truediv__(self,nombre):
+		if self.z > 0:
+			return Transfini(self.n, self.w, self.z - 1)
+		elif self.w > 0:
+			return Transfini(self.n, self.w - 1)
+		else:
+			return Transfini(self.n / nombre)
+	
 	"""def __sub__(self, autre):
 		if self.z < autre.z:
 			raise ArithmeticError
@@ -59,13 +67,40 @@ class Ensemble:
 	distribution = {}
 	
 	def __init__(self, points):
-		
-		self.points = points
-		self.actualise()
-		self.points = None
+		if type(points) == dict:
+			self.centre = points
+			for el in points:
+				if Ensemble.distribution[el] == None:
+					if points[el] > 0:
+						self.centre[el] = math.log(self.centre[el])
+					else:
+						self.centre[el] = Transfini(0,1)
+		if type(points) == list:
+			self.centre = {}
+			for el in points[0]:
+				
+				self[el] = points[0][el]
+				
+					
+				for enf in points[1:]:
+					if (not el in enf.centre) or \
+								(Ensemble.distribution[el] == 0 and enf[el] != self[el]):
+						del self[el]
+						break
+					else:
+						self[el] += enf[el] * enf.nombre_descendant
+				if Ensemble.distribution[el] != 0:
+					self[el] /= 
+				
 	
 	def __getitem__(self, clef):
 		return self.centre[clef]
+	
+	def __setitem__(self, clef, val):
+		self.centre[clef] = val
+	
+	def __delitem__(self, clef):
+		del self.centre[clef]
 	
 	def distance(self, point):
 				
@@ -73,7 +108,7 @@ class Ensemble:
 		for clef in self.centre:
 			if clef in point.centre:
 				if Ensemble.distribution[clef] == None:
-					if self[clef] == 0 or point[clef] == 0:
+					if self[clef] <= 0 or point[clef] <= 0:
 						somme += Transfini(0,1)
 					else:
 						somme += math.abs(math.log(self[clef] / point[clef]))
@@ -87,19 +122,7 @@ class Ensemble:
 		for clef in point.centre:
 			if not clef in self.centre:
 				somme += Transfini(0,0,1)
-		return somme			
-	
-	def actualise(self):
-		
-		""" recalcule l'espérance et la matrice de covariance
-		(non valable en mode incr) """
-		
-		self.nombre_descendant = len(self.points)
-		self.centre = np.zeros(self.dimension)
-		
-		for el in self.points:
-			self.centre += el
-		self.centre /= self.nombre_descendant
+		return somme
 									
 	
 	def __add__(self, point):
@@ -114,10 +137,10 @@ class Ensemble:
 		
 		self.nombre_descendant += 1
 		
-		if self.points != None:
-			self.points.append(point)
+		if self.centre != None:
+			self.centre.append(point)
 					
 		return self
 	
 	def __iter__(self):
-		return iter(self.points)
+		return iter(self.centre)

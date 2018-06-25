@@ -25,11 +25,9 @@ class Contraste:
         self.numberCluster=numberCluster
         self.infinitiesPoints=[]
         
-    def difference(self,cluster):
+    def difference(self,dataframe,center):
         """ return the difference between a dataframe and its center """
-        dataframe = cluster.core
         del dataframe['category']
-        center = cluster.prototype.center
         diff = (dataframe-center[:len(dataframe.columns)])
         var=self.variance(dataframe)
         infinities=[]
@@ -68,20 +66,27 @@ class Contraste:
         """ reapply gmm on each sharpens cluster """
 
         newListDatas=[]
+        
+        remainingDatas=[]
 
         for cluster in self.clustersList:
-            diff = self.difference(cluster)
+            diff = self.difference(cluster.core,cluster.prototype.center)
             sharp = self.sharpening(diff)
             newListDatas.append(sharp)
             
+            diff2=self.differenceRemaining(cluster.remaining,cluster.center)
+            sharp2=self.sharpening(diff2)
+            remainingDatas.append(sharp2)
+            
         newDataFrame=pd.concat(newListDatas) 
+        dataFrameRemaining = pd.concat(remainingDatas)
             
         newGmm = gmm.GMM(newDataFrame)
         lastDataFrame, centers = newGmm.result()
         clusterObject = clusterisation.Clusterisation(lastDataFrame,centers, isContrast = True,dimension = lastDataFrame.columns[0])
         listeClusters = clusterObject.result()
                 
-        return listeClusters
+        return listeClusters,dataFrameRemaining
             
             
     def result(self):

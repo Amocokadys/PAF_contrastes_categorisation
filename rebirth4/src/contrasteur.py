@@ -3,65 +3,54 @@
 """
 Created on Fri Jun 22 11:56:53 2018
 
-@author: antoine
+@author: Antoine, Aurélien
 
-On prend en entrée une liste d'objets cluster (comportant un dataframe, un vecteur centre,
-un label) catégorisation ; et une liste par dimension de listes de 3 objets clusters contraste
-On prend également un nouvel élément en entrée (un array numpy)
-
-On ressort un array contenant la catégorie et pour chaque dimension une information '+', '6' ou ''
+this file contains methods to classify an new element using the knowledge
+brought by the clusterisation of the dataset
+gives a category and a contrast category
 """
 
 import numpy as np
 import pandas as pd
 from math import sqrt
+import clusterisation
 
-def result(clustersCategories, listClustersContrast, element) :
-    """ on attribue à element le cluster dont il est le plus proche du centre """
+
+def closest(listCluster, point):
+    """
+    computes the closest cluster from point
+    """
     distance_min = -1
-    for cluster in clustersCategories :
-        distance_tmp = distanceEuclidienne(cluster.centre, element)
+    clusterMin = None
+    for cluster in listCluster :
+        distance_tmp = cluster.distance(element) 
         if (distance_tmp < distance_min or distance_min < 0) :
             distance_min = distance_tmp
-            cluster_category = cluster
-    
-    label = cluster_category.getLabel() 
-    
-    """ on attribue à element une liste de caractéristiques ('longueur +') pour chaque dimension
-        il faut déterminer pour chaque dimension de quel cluster element est le plus proche """
-    
-    contraste = []
-    
-    for k in range(len(listClustersContrast)):
-        distance_min = -1
-        for j in range(len(listClustersContrast[k])):
-            cluster = listClustersContrast[k][j]
-            distance_tmp = (cluster.centre[k] - element[k])**2
-            """ 3 clusters : normal, petit ou grand
-                la dimension est celle de la colonne du dataframe non nulle """
-            if (distance_tmp < distance_min or distance_min < 0):
-                distance_min = distance_tmp
-                cluster_contrast = cluster
-                dimension = cluster.points.columns[k]
-    
-        caracteristique = cluster_contrast.getLabel()
-        contraste.append(dimension + " " + "".join(caracteristique))
-    
-    return label, contraste
-
-""" on renvoie la dimension associée à la première colonne dont on rencontre une valeur non nulle """
-def dimensionNonNulle(dataframe):
-    for i, row in dataframe.iterrows():
-        for dim in dataframe.columns:
-            if row[dim] != 0:
-                return dim
+            clusterMin = cluster
+    return clusterMin
 
 
-def distanceEuclidienne(point_1, point_2):
-    distance = 0
-    for k in range(min(len(point_1),len(point_2))):
-        distance += (point_1[k] - point_2[k])**2
-    return distance
+class Contrasteur:
+    """
+    this class contains the information to classify and contrast an element
+    """
+    def __init__(self, listCategoryClusters, listContrastClusters):
+        self.listCategoryClusters = listCategoryClusters
+        self.listContrastClusters = listContrastClusters
+    
+
+    def classify(self, element):
+        """
+        computes the category of element, its contrast from that category, and
+        the category of this contrast.
+        returns the labels associated to the clusters
+        """
+        categoryCluster = closest(self.listCategoryClusters, element)
+        contrast_element = categoryCluster.getContrast(element)
+        # TODO : sharpening
+        contrastCluster = closest(self.listContrastClusters, contrast_element)
+        return categoryCluster, contrastCluster
+
 
 if __name__ == "__main__":
     #ar = np.array([[1.1, 2, 3.3, 4], [2.7, 10, 5.4, 7], [5.3, 9, 1.5, 15]])

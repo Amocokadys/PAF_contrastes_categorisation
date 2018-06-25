@@ -24,15 +24,11 @@ class Clusterisation:
         for i in range(nb_clusters):
             if self.isContrast:
                 clusters.append(ContrastCluster(dataframe.loc[dataframe['category']==i],\
-                                       means[i], self.dimension)) # for each cluster, selects the points in the cluster
+                                                means[i])) # for each cluster, selects the points in the cluster
             else:
                 clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
                                         means[i])) # for each cluster, selects the points in the cluster
-        protos = []
-        for c in clusters:
-            core = c.selectCore()
-            protos.append(Prototype(core))
-        return clusters, protos
+        return clusters
 
 
     def result(self):
@@ -51,21 +47,19 @@ class Prototype:
 
 class Cluster:
     """
-        we calculate the covariance matrix of a set of points
-        the input is a DataFrame containing the dataset of a cluster (including categories)
-        the output is the covariance matrix of  the cluster in an array shape
-    """          
-    
+    this represents a cluster
+    it contains a core, points closest to the center, a Prototype, an abstraction
+    of the cluster, and the remaining points, that are not in the core but that
+    the GMM algorithm affilited to it
+    """
     def __repr__(self):
         return (" dataframe: \n"+str(self.points)+"\n center:"+str(self.centre)+"\n label:"+str(self.label))
 
 
     def __init__(self, points, centre):
         """
-        if (len(points) == 2) :
-            pointMoyen = [(points[i][0] + points[i][1] + 1.0001)/2 for i in points.columns]
-            new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
-            points = points.append(new_data)
+        first, segregate the core and the remaining points
+        then compute the prototype, and the label
         """
         self.core, self.remaining = self.selectCore(points, centre)
         self.proto = Prototype(self.core)
@@ -89,6 +83,8 @@ class Cluster:
                     inCore = False
             if inCore:
                 core = core.append(row)
+            else:
+                remaining = remaining.append(row)
         return core, remaining
 
 
@@ -119,8 +115,27 @@ class Cluster:
         for k in self.propDict.keys():
             if self.propDict[k] >= 0.5:
                 self.label.append(k)
+
+
+    def distance(self, point):
+        """
+        computes the normalized distance between the point and the center of the
+        Cluster
+        """
+        return np.norm((point-self.proto.centre)/self.proto.stdDev)
+
+
+    def getContrast(self, point):
+        """
+        computes the contrast between the given point and the cluster
+        """
+        return (point-self.proto.centre)/self.proto.stdDev
+
         
 class ContrastCluster(Cluster):
+    """
+    a contrastCluster differs from a cluster by the computation of the label
+    """
     def __init__(self,points,centre):
         self.core, self.remaining = self.selectCore(points, centre)
         self.proto = Prototype(self.core)

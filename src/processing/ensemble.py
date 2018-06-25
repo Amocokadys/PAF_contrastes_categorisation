@@ -17,26 +17,44 @@ class Transfini:
 	
 	def __init__(self, n = 0, w = 0, z = 0):
 		self.n = n
-		self.w = w
-		self.z = z
+		self.w = int(w)
+		self.z = int(z)
+		self.signe = True
 	
 	def __gt__(self, autre):
-		return (self.w > autre.w) or (self.w == autre.w and self.n > autre.n)
+		if (not self.signe) and autre.signe:
+			return False
+		if (not autre.signe) and self.signe:
+			return True
+		if self.z != 0 or autre.z != 0:
+			return self.signe == (self.z > autre.z)
+		elif self.w != 0 or autre.w != 0:
+			return self.signe == (self.w > autre.w)
+		else:
+			return self.signe == (self.n > autre.n)
+
+
 	
 	def __ge__(self, autre):
-		return (self.w >= autre.w) or (self.w == autre.w and self.n >= autre.n)
+		return self.__gt__(autre) or self.__eq__(autre)
 	
 	def __lt__(self, autre):
-		return (self.w < autre.w) or (self.w == autre.w and self.n < autre.n)
+		return not self.__ge__(self, autre)
 	
 	def __le__(self, autre):
-		return (self.w <= autre.w) or (self.w == autre.w and self.n <= autre.n)
+		return not self.__gt__(self, autre)
 	
 	def __eq__(self, autre):
-		return self.n == autre.n and self.w == autre.w
+		if self.z != 0:
+			return self.z == autre.z
+		elif self.w != 0:
+			return self.w == autre.w
+		else:
+			return autre.n == self.n
+		
 	
 	def _neq__(self, autre):
-		return self.n != autre.n or self.w != autre.w
+		return not self.__eq__(self,autre)
 	
 	def __add__(self,autre):
 		if type(autre) == Transfini:
@@ -45,12 +63,26 @@ class Transfini:
 			return Transfini(autre + self.n, self.w, self.z)
 	
 	def __truediv__(self,nombre):
-		if self.z > 0:
-			return Transfini(self.n, self.w, self.z - 1)
-		elif self.w > 0:
+		if self.z > 1:
+			return Transfini(self.n,self.w,self.z - 1)
+		elif self.z == 1:
+			return Transfini(self.n, self.w)
+		elif self.w > 1:
 			return Transfini(self.n, self.w - 1)
+		elif self.w == 1:
+			return Transfini(self.n)
 		else:
 			return Transfini(self.n / nombre)
+	
+	def __neg__(self):
+		self.signe = not self.signe
+		return self
+		
+	def __str__(self):
+		if self.signe:
+			return str(self.n) + " + " + str(self.w) + "w + " + str(self.z) + "w2"
+		else:
+			return "- " + str(self.n) + " + " + str(self.w) + "w + " + str(self.z) + "w2"
 	
 	"""def __sub__(self, autre):
 		if self.z < autre.z:
@@ -64,34 +96,7 @@ class Transfini:
 
 class Ensemble:
 	
-	distribution = {}
-	
-	def __init__(self, points):
-		if type(points) == dict:
-			self.centre = points
-			for el in points:
-				if Ensemble.distribution[el] == None:
-					if points[el] > 0:
-						self.centre[el] = math.log(self.centre[el])
-					else:
-						self.centre[el] = Transfini(0,1)
-		if type(points) == list:
-			self.centre = {}
-			for el in points[0]:
-				
-				self[el] = points[0][el]
-				
-					
-				for enf in points[1:]:
-					if (not el in enf.centre) or \
-								(Ensemble.distribution[el] == 0 and enf[el] != self[el]):
-						del self[el]
-						break
-					else:
-						self[el] += enf[el] * enf.nombre_descendant
-				if Ensemble.distribution[el] != 0:
-					self[el] /= 
-				
+	distribution = {}				
 	
 	def __getitem__(self, clef):
 		return self.centre[clef]
@@ -111,7 +116,7 @@ class Ensemble:
 					if self[clef] <= 0 or point[clef] <= 0:
 						somme += Transfini(0,1)
 					else:
-						somme += math.abs(math.log(self[clef] / point[clef]))
+						somme += abs(math.log(self[clef] / point[clef]))
 				elif Ensemble.distribution[clef] == 0:
 					if point[clef] != self[clef]:
 						somme += Transfini(0,1)
@@ -127,18 +132,13 @@ class Ensemble:
 	
 	def __add__(self, point):
 		
-		"""actualise l'espérence et la matrice de covariance
-		d'un cluster après l'ajout d'un point, en temps constant par 
-		rapport au nombre
-		de points."""
+		"""actualise l'espérence d'un cluster après l'ajout d'un point, en temps constant par 
+		rapport au nombre de points."""
 		
-		
-		self.centre = (self.nombre_descendant * self.centre + point)/(self.nombre_descendant + 1)
+		for el in self:
+			self[el] = (self.nombre_descendant * self[el] + point[el])/(self.nombre_descendant + 1)
 		
 		self.nombre_descendant += 1
-		
-		if self.centre != None:
-			self.centre.append(point)
 					
 		return self
 	

@@ -33,8 +33,15 @@ class Feuille(Ensemble):
 	""" classe correspondant à une donnée"""
 		
 	def __init__(self, point, titre = ""):
+		self.nombre_descendant = 1
 		self.titre = titre
-		Ensemble.__init__(self,point)
+		self.centre = point
+		for el in point:
+			if Ensemble.distribution[el] == None:
+				if point[el] > 0:
+					self.centre[el] = math.log(self.centre[el])
+				else:
+					self.centre[el] = Transfini(0,1)
 		
 	def feuille(self):
 		return True
@@ -54,48 +61,56 @@ class Arbre(Ensemble):
 	
 	def __init__(self, enfants, label=None):
 		self.enfants = enfants
-		
+		self.nombre_descendant = len(self._private_liste_points())
 		if len(enfants) >= 2:
 			
-			self.variance = enfants[0].distance(enfants[1]) / 2
+			self.centre = {}
+			for el in enfants[0]:
+				
+				self[el] = enfants[0][el]
+				
+				poids_total = 0
+				for enf in enfants[1:]:
+					if (not el in enf.centre) or \
+								(Ensemble.distribution[el] == 0 and enf[el] != self[el]):
+						del self[el]
+						break
+					else:
+						poids_total += enf.nombre_descendant
+						self[el] += enf[el] * enf.nombre_descendant
+				if Ensemble.distribution[el] != 0 and el in self.centre:
+					self[el] /= poids_total
 			
+			self.variance = Transfini()
+			for i in range(len(enfants)):
+				for j in range(i+1,len(enfants)):
+					temp = enfants[i].distance(enfants[j])
+					if temp > self.variance:
+						self.variance = temp
 			
 			Arbre.nombre_instance += 1
 		
 	def feuille(self):
 		return False
 	
-	def variance(self):
-		max_distance = 0
-		for i in range(len(self.enfants)):
-			for j in range(i+1, len(self.enfants)):
-				dist = self
-	
 	def __add__(self, livre):
 		
 		""" ajout d'une donnée à l'arbre """
 		if len(self.enfants) == 0:
-			return Arbre([livre])
+			return Arbre([livre],"~")
+		if len(self.enfants) == 1:
+			return Arbre([livre, self.enfants[0]],"~")
 		min_enfant, min_distance = argmax_(self.enfants, key=lambda x:-x.distance(livre))
-	
-		if min_distance.distance(livre) > _SEUIL_NOUVEAU_CLUSTER:
+		
+		if min_distance.distance(livre) > self.variance / 2:
 			
-			try:
-				livre.feuille()
-				self.enfants.append(livre)
-			except AttributeError:
-				self.enfants += livre
-			
-			Ensemble.__add__(self,livre.centre)
-			self.matrice_enfants.points.append(livre.centre)
-			self.matrice_enfants.actualise()
-			
+			self.enfants.append(livre)						
 			self.regroupement()
 		
-		else:
-			
+		else:			
 			self.enfants[min_enfant] += livre
-			Ensemble.__add__(self, livre.centre)
+			
+		Ensemble.__add__(self, livre)
 		return self
 					
 		
@@ -131,7 +146,7 @@ class Arbre(Ensemble):
 	def dessin(self, chemin=""):
 		texte = ""
 		if chemin == "":
-			texte += "digraph G { " + self.dessin("r") + "}"
+			texte += "digraph G { " + self.dessin("~") + "}"
 			test = open("/tmp/bla.dot","w")
 			test.write(texte)
 			test.close()
@@ -152,12 +167,17 @@ class Arbre(Ensemble):
 					texte += el.dessin(chemin + str(idx))
 		return texte
 		
-"""
-Arbre.distribution = [None, None, None]
+
+Ensemble.distribution = {"taille" : None, "noyau" : 0, "peau" : 1}
+
+
+fraise = Feuille({"taille" : 3, "noyau" : 0}, "fraise" )
+peche = Feuille({"taille" : 7, "noyau" : 1, "peau" : 1}, "pêche")
+poire = Feuille({"taille" : 8, "noyau" : 0, "peau" : 2}, "poire")
+
 test = Arbre([])
+test += fraise
+test += peche
+test += poire
 
-test += Feuille([0,0,0], "abricot" )
-test += Feuille([1,0,0], "pêche", )
-test += Feuille([0.001,0,0], "poire")
-
-print(test.dessin())"""
+print(test.dessin())

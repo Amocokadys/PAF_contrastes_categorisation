@@ -14,7 +14,7 @@ class Clusterisation:
         self.arrayCenters = arrayCenters
         self.isContrast = isContrast
         self.dimension = dimension
-        
+
 
     def dataframeToCluster(self,dataframe,means):
         nb_clusters = len(means)
@@ -28,7 +28,6 @@ class Clusterisation:
             else:
                 clusters.append(Cluster(dataframe.loc[dataframe['category']==i],\
                                         means[i])) # for each cluster, selects the points in the cluster
-
         protos = []
         for c in clusters:
             core = c.selectCore()
@@ -68,12 +67,11 @@ class Cluster:
             new_data = pd.DataFrame([pointMoyen], columns = points.columns, index = pd.RangeIndex(start=2, stop=3, step=1))
             points = points.append(new_data)
         """
+        self.core, self.remaining = self.selectCore(points, centre)
+        self.proto = Prototype(self.core)
         self.propDict = {}
         self.label = []
         self.updateLabel()
-        # TODO : update the label function
-        self.core, self.remaining = self.selectCore(points, centre)
-        self.proto = Prototype(self.core)
         
 
     def selectCore(self, points, p = 3):
@@ -100,21 +98,13 @@ class Cluster:
         each label among the data of the cluster
         """
         self.propDict = {}
-        for idx in self.points.index:
-            if '#' in idx:
-                lst_idx = [idx.split('#')[0]]
-            else:
-                lst_idx = idx.split('~')[:-1]
-            for i in lst_idx:
-                self.propDict[i] = 0
+        for idx in self.core.index:
+            i = idx.split('#')[0]
+            self.propDict[i] = 0
 
-        for row in  self.points.itertuples():
-            if '#' in idx:
-                lst_idx = [idx.split('#')[0]]
-            else:
-                lst_idx = idx.split('~')[:-1]
-            for i in lst_idx:
-                self.propDict[i] += 1
+        for row in  self.core.itertuples():
+            i = idx.split('#')[0]
+            self.propDict[i] += 1
 
         for key in self.propDict.keys():
             self.propDict[key] /= len(self.points)
@@ -131,26 +121,14 @@ class Cluster:
                 self.label.append(k)
         
 class ContrastCluster(Cluster):
-    def __init__(self,points,centre,dimension):
-        self.centre=centre
-        self.points=points #un dataframe
-        self.propDict = {'=':0, '+':0, '-':0}
+    def __init__(self,points,centre):
+        self.core, self.remaining = self.selectCore(points, centre)
+        self.proto = Prototype(self.core)
         self.label=[]
-        self.subClusters=None
-        self.sharpedData = None
-        self.dim=dimension
         self.updateLabel()
         
-    def updatePropDict(self):
-        s = self.points[self.dim]
-        for idx, val in s.iteritems():
-            if val == 0:
-                self.propDict['=']+=1
-            elif val < 0:
-                self.propDict['-']+=1
-            else:
-                self.propDict['+']+=1
 
-    def updateLabel(self):
-        self.updatePropDict()
-        self.label.append(max(self.propDict, key = self.propDict.get))
+    def updateLabel(self, p = 0.5):
+        for i in len(self.proto.centre):
+            if abs(self.proto.centre.values[i]) > p:
+                self.label.append(self.proto.centre.columns[i],  np.sign(self.proto.centre.values[i]))

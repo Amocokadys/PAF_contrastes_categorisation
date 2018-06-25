@@ -62,6 +62,17 @@ class Feuille:
 	
 	def __str__(self):
 		return self.titre
+	
+	def cInsertion(self,feuille):
+		"""fonction de calcul de la complexite lors de la creation d'un nouveau cluster au niveau du noeud courant"""
+            
+		cActuelle = 0
+		for i in range(Ensemble.dimension):
+			cActuelle += int(np.log2(1+(feuille.centre[i]-self.centre[i])))
+		cActuelle += np.log2(1+Ensemble.nombreTotal)
+		return(cActuelle,[self.code])
+	
+
 
 class Arbre(Ensemble):
 			
@@ -100,7 +111,7 @@ class Arbre(Ensemble):
 			if cActuel<c:
 				chemin=cheminActuel
 				c=cActuel
-		chemin.append([self.code])
+		chemin.append(self.code)
 		return c, chemin
 	
 	def __add__(self, livre):
@@ -111,32 +122,36 @@ class Arbre(Ensemble):
 		if len(self.enfants) == 0:
 			livre.set_code("~0")
 			self.enfants.append(livre)
+			self.centre = livre.centre
+			livre.complex = 0
 			return self
 		
 		c, chemin = self.cInsertion(livre)
-		print(chemin)
+		chemin.reverse()
+		livre.complex = 0
 		
 		
-		noeud = self
-		for idx in chemin[1:]:
-			for el in noeud:
-				if el.code == idx:
-					if el.feuille():
-						livre.set_code(el.code + "0")
-						el.set_code(el.code + "1")
-						el += livre
-						return self
-					elif idx == chemin[-1]:
-						livre.set_code(idx + alphabet[len(noeud.enfants)])
-						el.enfants.append(livre)
-						return self
-					else:
-						noeud = el
-						Ensemble.dico.plus_un(noeud.code)
-						break
-			
-			raise IndexError("adresse invalide : " + idx + " non trouvé !")
 		
+		self._private_ajout(chemin[1:], livre)
+		return self
+	
+	def _private_ajout(self, chemin, livre):
+		for i in range(len(self.enfants)):
+			if self[i].code == chemin[0]:
+				if self[i].feuille():
+					livre.set_code(self[i].code + "0")
+					self[i].set_code(self[i].code + "1")
+					self.enfants[i] += livre
+					return
+				elif len(chemin) == 1:
+					livre.set_code(chemin[0] + alphabet[len(self.enfants)])
+					self.enfants.append(livre)
+					return
+				else:
+					self[i]._private_ajout(chemin[1:], livre)
+					Ensemble.dico.plus_un(self.code)
+					return
+		raise IndexError("adresse invalide : " + idx + " non trouvé !")
 		
 	def _private_liste_points(self):
 		

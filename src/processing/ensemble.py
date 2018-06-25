@@ -64,6 +64,7 @@ class Ensemble:
 		
 		
 		self.points = points
+		self.complex = 0
 		self.actualise()
 		if mode_incr:
 			self.points = None				
@@ -93,7 +94,7 @@ class Ensemble:
             
 		cActuelle = 0
 		for i in range(self.dimension):
-			cActuelle += int(np.log2(1+(feuille.centre[i]-self.centre[i])))
+			cActuelle += int(np.log2(1+abs(feuille.centre[i]-self.centre[i])))
 		cActuelle += np.log2(1+Ensemble.nombreTotal)
 		return(c+cActuelle,[self.code])
 								

@@ -4,7 +4,7 @@ import gmm
 import pandas as pd
 from arborescence import Feuille, Arbre
 import numpy as np
-import ensemble
+from ensemble import Ensemble
 
 def traitement(data, number):
     print(data.index)
@@ -35,7 +35,7 @@ i = 0
 try:
 	for k, row in data.iterrows():
 		print("ajout de l'élément ",i)
-		racine += Feuille(np.array(row.values[1:], dtype=np.float32), row.values[0])
+		racine += Feuille(np.array(row.values[1:], dtype=np.float32), row.values[0] + str(i))
 		i += 1
 	print(racine)
 except KeyboardInterrupt:

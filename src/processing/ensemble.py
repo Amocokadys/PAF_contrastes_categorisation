@@ -32,9 +32,14 @@ class Dictionnaire():
 		for i in range(len(self.liste)):
 			if code == self.liste[i][0]:
 				return i
-		return -1
+		raise IndexError("\"" + code + "\" non trouvé dans le dictionnaire")
 	
 	def ajout(self, code, nombre):
+		for i in range(len(self.liste)):
+			if code == self.liste[i][0]:
+				self.liste[i] = (self.liste[i][0], nombre)
+				self.liste.sort(key=lambda x:-x[1])
+				return
 		self.liste.append((code,nombre))
 		self.liste.sort(key=lambda x:-x[1])
 
@@ -43,6 +48,8 @@ class Ensemble:
 	"""classe gérant une liste de vecteurs, et calculant leur espérance et leur complexité"""
 	
 	dico = Dictionnaire()
+	dimension = 0
+	nombreTotal = 0
 	
 	def __init__(self, points, mode_incr = False):
 		
@@ -79,7 +86,7 @@ class Ensemble:
 		c=0
 		
 		for fils in self.enfants:
-			c+=int(np.log2(1+Ensemble.dico[fils.id]))
+			c+=int(np.log2(1+Ensemble.dico[fils.code]))
 			for i in range(self.dimension):
 				c+=int(np.log2(1+abs((self.centre[i]*self.dimension+feuille.centre[i])/(self.dimension+1)-fils.centre[i])))
 			c+=fils.complex
@@ -88,13 +95,13 @@ class Ensemble:
 		for i in range(self.dimension):
 			cActuelle += int(np.log2(1+(feuille.centre[i]-self.centre[i])))
 		cActuelle += np.log2(1+Ensemble.nombreTotal)
-		return(c+cActuelle,[self.id])
+		return(c+cActuelle,[self.code])
 								
 		
 		
 	def updateC(self):
 		for fils in self.enfants:
-			self.complex += int(np.log2(1+Ensemble.dico[fils.id]))
+			self.complex += int(np.log2(1+Ensemble.dico[fils.code]))
 			for i in range(self.dimension):
 				self.complex += int(np.log2(1+abs(self.centre[i]-fils.centre[i])))
 			self.complex += fils.complex

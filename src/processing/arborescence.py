@@ -37,45 +37,28 @@ class Feuille:
 	""" classe correspondant à une donnée"""
 		
 	def __init__(self, point, titre = ""):
-		Arbre.nombreTotal += 1
+		Ensemble.nombreTotal += 1
 		self.titre = titre
 		self.code = ""
-		for i in range(len(point)):
-			if Arbre.distribution[i] == None:
-				if point[i] <= 0:
-					point[i] == np.inf
-				else:
-					point[i] = math.log(point[i]) * _RAPPORT_LOG
-			else:
-				point[i] /= Arbre.distribution[i]
 		self.centre = point
 		Ensemble.dico.ajout(titre,1)
 		
 	def feuille(self):
 		return True
 	
+	def set_code(self, code):
+		self.code = code
+		Ensemble.dico.ajout(code, 1)
+	
 	def __iter__(self):
 		return iter(self.centre)
 	
-	def matrice(self):
-		return np.eye(len(self.centre)) * _CONSTANTE
-	
-	def distance(self, point):
-		
-		""" distance euclidienne """
-		
-		somme = 0
-		for i in range(len(point.centre)):
-				somme += (point.centre[i] - self.centre[i])**2
-		return math.sqrt(somme) / _CONSTANTE
 	
 	def __add__(self, point):
 		return Arbre([self, point], point.code)
     
 	def updateC(self):
 		self.complex = int(np.log2(1+Ensemble.dico[self.titre]))
-
-
 	
 	def __str__(self):
 		return self.titre
@@ -83,34 +66,30 @@ class Feuille:
 class Arbre(Ensemble):
 			
 	nombre_instance = 0
-	distribution = None
-	nombreTotal = 0
 	
 	
-	def __init__(self, enfants, label):
+	
+	def __init__(self, enfants, code):
 		self.enfants = enfants
 
-		self.label = label
-		Ensemble.dico.ajout(label,len(enfants))
+		self.code = code
+		Ensemble.dico.ajout(code,len(enfants))
 		if len(enfants) != 0:
 			
 			descendants = self._private_liste_points()
 			
 			
 			self.groupe = Ensemble.__init__(self, descendants, True)
-			self.actualise_enfants()
 			Arbre.nombre_instance += 1
+	
+	def __iter__(self):
+		return iter(self.enfants)
+	
+	def __getitem__(self, nombre):
+		return self.enfants[nombre]
 		
 	def feuille(self):
 		return False
-	
-	def actualise_enfants(self):
-		
-		""" crée et actualise une espérance/matrice de covariance correspondant
-		aux centres des noeuds enfants"""
-		
-		centres = [el.centre for el in self.enfants]
-		self.matrice_enfants = Ensemble(centres, False)
         
     
 	def cInsertion(self,feuille):
@@ -121,22 +100,43 @@ class Arbre(Ensemble):
 			if cActuel<c:
 				chemin=cheminActuel
 				c=cActuel
-		chemin.append([self.id])
+		chemin.append([self.code])
 		return c, chemin
 	
 	def __add__(self, livre):
 		
 		""" ajout d'une donnée à l'arbre """
-
-		Ensemble.dico.plus_un(self.label)
-        
-		self.cInsertion(livre)
-        
-		return self
-					
 		
-		#random = np.random.random(len(enfants[0]),len(enfants[0]))
-		#self.matriceCov += pd.DataFrame(random * 10e-6)
+		Ensemble.dico.plus_un(self.code)
+		if len(self.enfants) == 0:
+			livre.set_code("~0")
+			self.enfants.append(livre)
+			return self
+		
+		c, chemin = self.cInsertion(livre)
+		print(chemin)
+		
+		
+		noeud = self
+		for idx in chemin[1:]:
+			for el in noeud:
+				if el.code == idx:
+					if el.feuille():
+						livre.set_code(el.code + "0")
+						el.set_code(el.code + "1")
+						el += livre
+						return self
+					elif idx == chemin[-1]:
+						livre.set_code(idx + alphabet[len(noeud.enfants)])
+						el.enfants.append(livre)
+						return self
+					else:
+						noeud = el
+						Ensemble.dico.plus_un(noeud.code)
+						break
+			
+			raise IndexError("adresse invalide : " + idx + " non trouvé !")
+		
 		
 	def _private_liste_points(self):
 		
@@ -183,9 +183,9 @@ class Arbre(Ensemble):
 		else:
 			for idx, el in enumerate(self.enfants):
 				if el.feuille():
-					texte += "\"" + self.label + "\" -> \"" + el.titre + "\";"
+					texte += "\"" + self.code + "\" -> \"" + el.titre + "\";"
 				else:
-					texte += "\"" + self.label + "\" -> \"" + el.label + "\";"
+					texte += "\"" + self.code + "\" -> \"" + el.code + "\";"
 					texte += el.dessin(False)
 		return texte
 		

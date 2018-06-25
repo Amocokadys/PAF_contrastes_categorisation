@@ -4,6 +4,7 @@ import gmm
 import pandas as pd
 from arborescence import Feuille, Arbre
 import numpy as np
+import ensemble
 
 def traitement(data, number):
     print(data.index)
@@ -23,16 +24,10 @@ def contrast(data):
 
 
 data = pd.read_csv("../../jeux de donne/breast_cancer/wdbc.csv")
+ensemble.Ensemble.dimension = len(data.columns)
+
 del data["ID"]
 data.index = data["diagnosis"]
-
-Arbre.distribution = [None, None, None, None, None, None, 0.4, 0.2, None, None ] * 3
-
-""" 
-	max_cancer indique le comportement des différentes dimensions :
-	-  None   -> l'échelle logarithmique est plus pertinente
-	-  n > 0  -> l'échelle linéaire est plus pertinente, et les valeurs ne dépassent jamais n.
-	"""
 
 
 racine = Arbre([], "~")

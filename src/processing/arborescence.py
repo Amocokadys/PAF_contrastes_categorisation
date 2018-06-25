@@ -168,16 +168,17 @@ class Arbre(Ensemble):
 		return texte
 		
 
-Ensemble.distribution = {"taille" : None, "noyau" : 0, "peau" : 1}
-
-
-fraise = Feuille({"taille" : 3, "noyau" : 0}, "fraise" )
-peche = Feuille({"taille" : 7, "noyau" : 1, "peau" : 1}, "pêche")
-poire = Feuille({"taille" : 8, "noyau" : 0, "peau" : 2}, "poire")
+Ensemble.distribution = {"taille" : None, "noyau" : 0, "peau" : 1, "coque" : None, "quartier" : 10}
 
 test = Arbre([])
-test += fraise
-test += peche
-test += poire
+test += Feuille({"taille" : 3, "noyau" : 0}, "fraise" )
+test += Feuille({"taille" : 7, "noyau" : 1, "peau" : 1}, "pêche")
+test += Feuille({"taille" : 8, "noyau" : 0, "peau" : 2}, "poire")
+test += Feuille({"taille" : 4, "coque" : 4}, "noix")
+test += Feuille({"taille" : 2, "coque" : 2}, "noisette")
+test += Feuille({"taille" : 10, "quartier" : 10}, "orange")
+test += Feuille({"taille" : 15, "quartier" : 10}, "pamplemousse")
+
+#test += Feuille({"taille" : })
 
 print(test.dessin())

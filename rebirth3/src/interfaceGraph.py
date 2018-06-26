@@ -39,7 +39,7 @@ class Frame_principal (Frame):
    var_texte = StringVar()
    ligne_texte = Entry(self, textvariable=var_texte, width=30)
    self.attributs.append(ligne_texte)
-   ligne_texte.grid(row=k+2,column=2)
+   ligne_texte.grid(row=k+1,column=2)
    """
    button = Button(self, text="Get "+listelabels[k], command= lambda x=k: self.on_button(x))
    self.buttons.append(button)

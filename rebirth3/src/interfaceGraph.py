@@ -9,48 +9,73 @@ import gmm
 import contrasteur
 
 
-def graphic_clusters_fruits(gmm):
- #Visualisation des clusters formés par K-Means
+def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
+ #Visualisation des clusters formés par gmm
  data, centers=gmm.result()
  colorlist= list(matplotlib.colors.cnames.keys())
  random.shuffle(colorlist)
  colorpoints=[]
- for point in data.itertuples():
-  colorpoints.append(colorlist[point[-1]])
- plt.scatter(data.r,data.fibres,c=colorpoints,edgecolor='k')
- plt.title('Classification K-means ')
- plt.xlabel("rouge")
- plt.ylabel("longueur")
- plt.savefig('rouge_longueur.png')
+ for p in data.itertuples():
+  colorpoints.append(colorlist[p[-1]])
+ plt.plot(point[0],point[1],"b:*",markersize=20)
+ plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k')
+ plt.title('Classification gmm ')
+ plt.xlabel(colonne1)
+ plt.ylabel(colonne2)
+ plt.savefig('graphique.png')
+ plt.clf()
  
 class Frame_principal (Frame):
  
- def __init__(self,listelabels,mclusters,listeContrastes):
+ def __init__(self,listelabels,mclusters,listeContrastes,mgmm):
   Frame.__init__(self, borderwidth = 50, bg='red')
   self.mclusters=mclusters
   self.listeContrastes=listeContrastes
  
 #----#----#----#----#----#----#        l'input des valeurs           #----#----
+  self.listelabels=listelabels
   self.attributs=[]
   self.buttons=[]
+  self.mgmm=mgmm
+  
+  #pour preremplir dans le cas des fruits
+  valeur=False
+  if len(listelabels==8):
+   valeur=True
+   listeValeurs=np.array([40, 10, 222, 41, 22, 220, 94, 1.2])
+   
+  #liste des champs à remplir 
   for k in range(len(listelabels)):
    champ_label = Label(self, text=listelabels[k])
    champ_label.grid(row=k+1,column=1)
    var_texte = StringVar()
    ligne_texte = Entry(self, textvariable=var_texte, width=30)
-   self.attributs.append(ligne_texte)
+   if valeur:
+    ligne_texte.insert(0,listeValeurs[k])
+   self.attributs.append(var_texte)
    ligne_texte.grid(row=k+1,column=2)
-   """
-   button = Button(self, text="Get "+listelabels[k], command= lambda x=k: self.on_button(x))
-   self.buttons.append(button)
-   button.grid(row=3+2*k, column=1)"""
    
  
 #----#----#----#----#----#----#        l'image des clusters          #----#----#----#----
-  gmmTest=gmm.BDD("../data/fruitsModifiedAdjectives.csv")
-  gmmTest=gmm.GMM(gmmTest.resultFruit())
-  graphic_clusters_fruits(gmmTest)
-  image = Image.open("rouge_longueur.png") 
+
+
+  #le menu deroulant des affichages qu on peut choisir
+  self.var_choix = StringVar()
+  for k in range(len(self.listelabels)):
+   choix=Radiobutton(self, text=self.listelabels[k], variable=self.var_choix, value=self.listelabels[k]+str(k))
+   choix.grid(row=k+1, column=4)
+  self.var_choix.set(self.listelabels[0]+"0")
+  
+  
+   
+  self.var_choix1 = StringVar()
+  for k in range(len(self.listelabels)):
+   choix=Radiobutton(self, text=self.listelabels[k], variable=self.var_choix1, value=self.listelabels[k]+str(k))
+   choix.grid(row=k+1, column=5)
+  self.var_choix1.set(self.listelabels[1]+"1")
+   
+  graphic_clusters_fruits(self.mgmm,str(self.var_choix.get()[:-1]),str(self.var_choix1.get()[:-1]),np.array([40, 10]))
+  image = Image.open("graphique.png") 
   self.photo = ImageTk.PhotoImage(image)
   espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
   espace_image.grid(row=1, column=0,rowspan=10)
@@ -59,8 +84,22 @@ class Frame_principal (Frame):
   button1=Button(self, text="resultat", command= self.fonctionTest)
   button1.grid(row=12, column=0)
 
- def on_button(self,k):
-  print(self.attributs[k].get())
+  #pour retracer le graphe
+  self.buttonGraph=Button(self, text="retracer graphe", command= self.tracerGraph)
+  self.buttonGraph.grid(row=0,column=0)
+  
+ def tracerGraph(self):
+  index=[int(self.var_choix.get()[-1]),int(self.var_choix1.get()[-1])]
+  point=np.array([float(self.attributs[k].get()) for k in index])
+  graphic_clusters_fruits(self.mgmm,str(self.var_choix.get()[:-1]), str(self.var_choix1.get()[:-1]), point)
+  image = Image.open("graphique.png") 
+  self.photo = ImageTk.PhotoImage(image)
+  espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  espace_image.grid(row=1, column=0,rowspan=10)
+  espace_image.create_image(323, 242, image =self.photo)
+  
+ def on_button(self):
+  print(self.var_choix.get(),"coucou")
 
  def fonctionTest(self):
   data=np.array([float(attribut.get()) for attribut in self.attributs])
@@ -72,10 +111,10 @@ class Frame_principal (Frame):
   
   
 class Application(Frame):
- def __init__(self,listelabels,mclusters,listeContrastes):
+ def __init__(self,listelabels,mclusters,listeContrastes,mgmm):
  
   Frame.__init__(self)
-  partie_principale = Frame_principal(listelabels,mclusters,listeContrastes)
+  partie_principale =  Frame_principal(listelabels,mclusters,listeContrastes,mgmm)
   partie_principale.grid()
  
 

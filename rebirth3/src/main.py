@@ -16,7 +16,7 @@ def clusters_from_dataframe(df, ncluster):
     mgmm = gmm.GMM(df)
     clusters, centres = mgmm.result()
     mclusters = clusterisation.Clusterisation(clusters, centres)
-    return mclusters.result()
+    return mclusters.result(),mgmm
     
 
 def clusters_from_db(filename, ncluster):
@@ -33,7 +33,7 @@ def main(filename, ncluster, point):
     """
     this function does something
     """
-    mclusters = clusters_from_db(filename, ncluster)
+    mclusters,mgmm = clusters_from_db(filename, ncluster)
     
     colonnes=np.array(mclusters[0].getDataFrame().columns)
     if 'category' in colonnes:
@@ -45,7 +45,7 @@ def main(filename, ncluster, point):
     contrasteObject = contraste.Contraste(mclusters)
     listeContrastes = contrasteObject.result()
     #res=contrasteur.result(mclusters, listeContrastes, point) 
-    return mclusters,listeContrastes #res
+    return mclusters,listeContrastes,mgmm #res
 
     #return contrasteur.result(mclusters, point)
 
@@ -58,6 +58,7 @@ if __name__ == "__main__":
     if "fruit" in data.columns:
         del(data["fruit"])
     colonnes=np.array(data.columns)
-    mclusters,listeContrastes=main("../data/fruitsModifiedAdjectives.csv", 10, point)
-    appli = interfaceGraph.Application(colonnes,mclusters,listeContrastes) 
+    mclusters,listeContrastes, mgmm=main("../data/fruitsModifiedAdjectives.csv", 10, point)
+
+    appli = interfaceGraph.Application(colonnes,mclusters,listeContrastes,mgmm) 
     appli.mainloop()

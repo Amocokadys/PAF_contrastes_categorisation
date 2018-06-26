@@ -135,10 +135,7 @@ class Ensemble:
 		"""actualise l'espérence d'un cluster après l'ajout d'un point, en temps constant par 
 		rapport au nombre de points."""
 		
-		for el in self:
-			self[el] = (self.nombre_descendant * self[el] + point[el])/(self.nombre_descendant + 1)
 		
-		self.nombre_descendant += 1
 					
 		return self
 	

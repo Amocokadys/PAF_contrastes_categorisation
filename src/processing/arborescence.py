@@ -10,6 +10,8 @@ import math
 import numpy as np
 from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Transfini
 import subprocess
+import csv
+from random import randint
 
 def argmax_(liste,key=lambda x:x):
 	if len(liste) == 0:
@@ -81,12 +83,6 @@ class Arbre(Ensemble):
 				if Ensemble.distribution[el] != 0 and el in self.centre:
 					self[el] /= poids_total
 			
-			self.variance = Transfini()
-			for i in range(len(enfants)):
-				for j in range(i+1,len(enfants)):
-					temp = enfants[i].distance(enfants[j])
-					if temp > self.variance:
-						self.variance = temp
 			
 			Arbre.nombre_instance += 1
 		
@@ -110,7 +106,19 @@ class Arbre(Ensemble):
 		else:			
 			self.enfants[min_enfant] += livre
 			
-		Ensemble.__add__(self, livre)
+		for el in self:
+			if el in livre:
+				self[el] = (self.nombre_descendant * self[el] + livre[el])/(self.nombre_descendant + 1)
+		
+		self.variance = Transfini()
+		for i in range(len(self.enfants)):
+			for j in range(i+1,len(self.enfants)):
+				temp = self.enfants[i].distance(self.enfants[j])
+				if temp > self.variance:
+					self.variance = temp
+		
+		self.nombre_descendant += 1
+		
 		return self
 					
 		
@@ -132,7 +140,41 @@ class Arbre(Ensemble):
 	def regroupement(self):
 		"""méthode visant à regrouper si besoin les enfants d'un noeud,
 		pour les regrouper dans un cluster fils """
-		pass
+		
+		
+		
+		
+		
+		def banane(el):
+			for cat in sous_groupes:
+				if el.distance(cat[0]) < variance:
+					cat.append(el)
+					return
+			sous_groupes.append([el])
+		def titre():
+			titre = []
+			for liste in sous_groupes:
+				titre.append(liste[0].titre[:-1] + "(")
+				for toto in liste:
+					titre[-1] += toto.titre[-1]
+			return titre
+		
+		variance = Transfini()
+		for i in range(len(self.enfants)):
+			for j in range(i+1,len(self.enfants)):
+				temp = self.enfants[i].distance(self.enfants[j])
+				if temp > self.variance:
+					variance = temp
+		if variance >= Transfini(0,1):
+			sous_groupes = []
+			for el in self.enfants:
+				banane(el)
+			
+			self.enfants = [Arbre(sous_groupes[i], titre[i]) for i in range(len(sous_groupes))]
+		else:
+			pass
+			
+						
 	
 	def __str__(self):
 		chaine = "[ "
@@ -168,17 +210,39 @@ class Arbre(Ensemble):
 		return texte
 		
 
-Ensemble.distribution = {"taille" : None, "noyau" : 0, "peau" : 1, "coque" : None, "quartier" : 10}
+racine = Arbre([], "~")
 
-test = Arbre([])
-test += Feuille({"taille" : 3, "noyau" : 0}, "fraise" )
-test += Feuille({"taille" : 7, "noyau" : 1, "peau" : 1}, "pêche")
-test += Feuille({"taille" : 8, "noyau" : 0, "peau" : 2}, "poire")
-test += Feuille({"taille" : 4, "coque" : 4}, "noix")
-test += Feuille({"taille" : 2, "coque" : 2}, "noisette")
-test += Feuille({"taille" : 10, "quartier" : 10}, "orange")
-test += Feuille({"taille" : 15, "quartier" : 10}, "pamplemousse")
 
-#test += Feuille({"taille" : })
 
-print(test.dessin())
+
+feuilles = []
+predistribution = []
+
+with open("../../jeux de donne/fruits_transfinis.csv", "r") as fichier:
+	cursor = csv.reader(fichier, delimiter=",")
+	
+	for ligne in cursor:
+		if len(predistribution) == 0:
+			predistribution = ligne[1:]
+		elif len(Ensemble.distribution) == 0:
+			for i in range(len(predistribution)):
+				if ligne[i+1] == "none":
+					Ensemble.distribution[predistribution[i]] = None
+				else:
+					print("-",ligne[i],"-")
+					Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
+		else:
+			dico = {}
+			for i in range(1, len(ligne)):
+				if len(ligne[i]) > 0:
+					dico[predistribution[i-1]] = float(ligne[i])
+			feuilles.append(Feuille(dico, ligne[0]))
+			
+
+while len(feuilles) > 0:
+	au_sort = randint(0, len(feuilles)-1)
+	racine += feuilles[au_sort]
+	del feuilles[au_sort]
+	
+
+print(racine.dessin())

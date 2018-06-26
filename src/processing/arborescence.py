@@ -10,6 +10,7 @@ import math
 import numpy as np
 from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Transfini
 import subprocess
+from random import randint
 
 def argmax_(liste,key=lambda x:x):
 	if len(liste) == 0:
@@ -155,12 +156,41 @@ class Arbre(Ensemble):
 					texte += el.dessin(chemin + str(idx))
 		return texte
 		
-"""
-Arbre.distribution = [None, None, None]
-test = Arbre([])
 
-test += Feuille([0,0,0], "abricot" )
-test += Feuille([1,0,0], "pêche", )
-test += Feuille([0.001,0,0], "poire")
 
-print(test.dessin())"""
+racine = Arbre([], "~")
+
+
+
+
+feuilles = []
+predistribution = []
+
+with open("../../jeux de donne/fruits_transfinis.csv", "r") as fichier:
+	cursor = csv.reader(fichier, delimiter=",")
+	
+	for ligne in cursor:
+		if len(predistribution) == 0:
+			predistribution = ligne[1:]
+		elif len(Ensemble.distribution) == 0:
+			for i in range(len(predistribution)):
+				if ligne[i+1] == "none":
+					Ensemble.distribution[predistribution[i]] = None
+				else:
+					print("-",ligne[i],"-")
+					Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
+		else:
+			dico = {}
+			for i in range(1, len(ligne)):
+				if len(ligne[i]) > 0:
+					dico[predistribution[i-1]] = float(ligne[i])
+			feuilles.append(Feuille(dico, ligne[0]))
+			
+
+while len(feuilles) > 0:
+	au_sort = randint(0, len(feuilles)-1)
+	racine += feuilles[au_sort]
+	del feuilles[au_sort]
+	
+
+print(racine.dessin())

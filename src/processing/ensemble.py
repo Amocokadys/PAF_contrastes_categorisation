@@ -109,8 +109,10 @@ class Ensemble:
 		rapport au nombre
 		de points."""
 		
-		
-		self.centre = (self.nombre_descendant * self.centre + point)/(self.nombre_descendant + 1)
+
+		for el in self:
+			if el in point:
+				self[el] = (self.nombre_descendant * self[el] + point[el])/(self.nombre_descendant + 1)
 		
 		self.nombre_descendant += 1
 		

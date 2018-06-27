@@ -7,7 +7,7 @@ import matplotlib
 import random
 import gmm
 import contrasteur
- 
+
 
 def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
  """fonction pour enregistrer l'image du cluster de l'objet gmm projetés sur les dimensions colonne1 et colonne2 ainsi que le point. Le graphique est enregistré sur graphique.png"""
@@ -17,17 +17,16 @@ def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
  random.shuffle(colorlist)
  colorpoints=[]
  labels=[]
- for k, row in data.iterrows():
+ for p in data.itertuples():
   #print(type(p))
   #print(p)
-  colorpoints.append(colorlist[row[len(row)-1].astype(int)])
-  labels.append(k)
+  colorpoints.append(colorlist[p[-1]])
+  #labels.append(p.index[0])
  plt.plot(point[0],point[1],"b:*",markersize=20)
  plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k',label=labels)
  plt.title('Classification gmm ')
  plt.xlabel(colonne1)
  plt.ylabel(colonne2)
- plt.legend()
  plt.savefig('graphique.png')
  plt.clf()
  
@@ -193,7 +192,4 @@ class ApplicationInterface(Frame):
   Frame.__init__(self)
   partie_principale =  FrameIncrementale(listelabels)
   partie_principale.grid()
-<<<<<<< HEAD
-=======
   
->>>>>>> interface methode incrementale a modifier par Louis

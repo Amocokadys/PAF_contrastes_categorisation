@@ -17,6 +17,9 @@ import math as m
 import gmm
 import clusterisation
 
+from constantes import *
+
+
 class Contraste:
     
     def __init__(self,clustersList,critere=0.2,numberCluster=3):
@@ -32,21 +35,28 @@ class Contraste:
         diff = (dataframe-center[:len(dataframe.columns)])/self.variance(dataframe)
         return diff
              
+
     def variance(self,dataFrame):
         return dataFrame.var(axis=0)
+    
+
+    def sharpening(self, point):
+        """
+        only selects values from point that are smaller than p
+        """
+        return point.mask(abs(point) < SHARPEN_PARAM, other = 0)
         
-        
-    def sharpening(self,diff):
-        """ sharps the dataframe in function a critere"""
-        
-        maxiListe = diff.max(axis=0)
-        
-        for k in diff.iterrows():
-            for j in range(len(k[1])):
-                if(abs(k[1][j])<self.critere*maxiListe[j]):
-                    k[1][j]=0  
-                
-        return diff
+    #def sharpening(self,diff):
+    #    """ sharps the dataframe in function a critere"""
+    #    
+    #    maxiListe = diff.max(axis=0)
+    #    
+    #    for k in diff.iterrows():
+    #        for j in range(len(k[1])):
+    #            if(abs(k[1][j])<self.critere*maxiListe[j]):
+    #                k[1][j]=0  
+    #            
+    #    return diff
     
     def putZeros(self,dataframe,i):
         result=dataframe.copy(deep=True)

@@ -129,3 +129,21 @@ class Application(Frame):
 """
 appli = Application(["rouge","bleu","vert"]) 
 appli.mainloop()"""
+
+
+class FrameIncrementale(Frame):
+ """pour l'interface graphique de la methode incremnetale"""
+ 
+ def __init__(self,listeOptions):
+  Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
+  for k in range(10):
+   v = StringVar()
+   v.set(listeOptions[0])
+   om = OptionMenu(self, v, *listeOptions)
+   om.grid(row=k, column=1)
+  
+class ApplicationInterface(Frame):
+ def __init__(self,listelabels):
+  Frame.__init__(self)
+  partie_principale =  FrameIncrementale(listelabels)
+  partie_principale.grid()

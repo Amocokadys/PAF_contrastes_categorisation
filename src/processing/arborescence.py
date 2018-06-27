@@ -10,11 +10,9 @@ import math
 import numpy as np
 from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Transfini
 import subprocess
-<<<<<<< HEAD
-=======
 import csv
->>>>>>> méthode_complexité
 from random import randint
+
 
 def argmax_(liste,key=lambda x:x):
 	if len(liste) == 0:
@@ -69,10 +67,12 @@ class Arbre(Ensemble):
 		self.nombre_descendant = len(self._private_liste_points())
 		if len(enfants) >= 2:
 			
+			self.calcul_variance()
 			self.centre = {}
 			for el in enfants[0]:
 				
 				self[el] = enfants[0][el]
+				
 				
 				poids_total = 0
 				for enf in enfants[1:]:
@@ -92,6 +92,14 @@ class Arbre(Ensemble):
 	def feuille(self):
 		return False
 	
+	def calcul_variance(self):
+		self.variance = Transfini()
+		for i in range(len(self.enfants)):
+			for j in range(i+1,len(self.enfants)):
+				temp = self.enfants[i].distance(self.enfants[j])
+				if temp > self.variance:
+					self.variance = temp
+	
 	def __add__(self, livre):
 		
 		""" ajout d'une donnée à l'arbre """
@@ -104,7 +112,7 @@ class Arbre(Ensemble):
 		if min_distance.distance(livre) > self.variance / 2:
 			
 			self.enfants.append(livre)						
-			self.regroupement()
+			#self.regroupement()
 		
 		else:			
 			self.enfants[min_enfant] += livre
@@ -150,7 +158,7 @@ class Arbre(Ensemble):
 		
 		def banane(el):
 			for cat in sous_groupes:
-				if el.distance(cat[0]) < variance:
+				if el.distance(cat[0]) < self.variance:
 					cat.append(el)
 					return
 			sous_groupes.append([el])
@@ -162,13 +170,9 @@ class Arbre(Ensemble):
 					titre[-1] += toto.titre[-1]
 			return titre
 		
-		variance = Transfini()
-		for i in range(len(self.enfants)):
-			for j in range(i+1,len(self.enfants)):
-				temp = self.enfants[i].distance(self.enfants[j])
-				if temp > self.variance:
-					variance = temp
-		if variance >= Transfini(0,1):
+		
+		self.calcul_variance()
+		if self.variance >= Transfini(0,1):
 			sous_groupes = []
 			for el in self.enfants:
 				banane(el)
@@ -190,7 +194,7 @@ class Arbre(Ensemble):
 	
 	def dessin(self, chemin=""):
 		texte = ""
-		if chemin == "":
+		if chemin == "" or chemin == "*":
 			texte += "digraph G { " + self.dessin("~") + "}"
 			test = open("/tmp/bla.dot","w")
 			test.write(texte)
@@ -198,9 +202,15 @@ class Arbre(Ensemble):
 			pipe=subprocess.Popen(['dot','-Tpng', '/tmp/bla.dot'],stdout=subprocess.PIPE)
 			l=pipe.stdout.read()
 			pipe.wait()
-			pipe=subprocess.Popen(['display'],stdin=subprocess.PIPE)
-			pipe.stdin.write(l)
-			pipe.stdin.close()
+			if chemin == "":
+				pipe=subprocess.Popen(['display'],stdin=subprocess.PIPE)
+				pipe.stdin.write(l)
+				pipe.stdin.close()
+			else:
+				toto = open("/tmp/graphviz.png","wb")
+				toto.write(l)
+				toto.close()
+				
 			
 			
 		else:
@@ -213,79 +223,7 @@ class Arbre(Ensemble):
 		return texte
 		
 
-<<<<<<< HEAD
 
-racine = Arbre([], "~")
-
-
-
-
-feuilles = []
-predistribution = []
-
-with open("../../jeux de donne/fruits_transfinis.csv", "r") as fichier:
-	cursor = csv.reader(fichier, delimiter=",")
-	
-	for ligne in cursor:
-		if len(predistribution) == 0:
-			predistribution = ligne[1:]
-		elif len(Ensemble.distribution) == 0:
-			for i in range(len(predistribution)):
-				if ligne[i+1] == "none":
-					Ensemble.distribution[predistribution[i]] = None
-				else:
-					print("-",ligne[i],"-")
-					Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
-		else:
-			dico = {}
-			for i in range(1, len(ligne)):
-				if len(ligne[i]) > 0:
-					dico[predistribution[i-1]] = float(ligne[i])
-			feuilles.append(Feuille(dico, ligne[0]))
-			
-
-while len(feuilles) > 0:
-	au_sort = randint(0, len(feuilles)-1)
-	racine += feuilles[au_sort]
-	del feuilles[au_sort]
 	
 
-print(racine.dessin())
-=======
-racine = Arbre([], "~")
 
-
-
-
-feuilles = []
-predistribution = []
-
-with open("../../jeux de donne/fruits_transfinis.csv", "r") as fichier:
-	cursor = csv.reader(fichier, delimiter=",")
-	
-	for ligne in cursor:
-		if len(predistribution) == 0:
-			predistribution = ligne[1:]
-		elif len(Ensemble.distribution) == 0:
-			for i in range(len(predistribution)):
-				if ligne[i+1] == "none":
-					Ensemble.distribution[predistribution[i]] = None
-				else:
-					print("-",ligne[i],"-")
-					Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
-		else:
-			dico = {}
-			for i in range(1, len(ligne)):
-				if len(ligne[i]) > 0:
-					dico[predistribution[i-1]] = float(ligne[i])
-			feuilles.append(Feuille(dico, ligne[0]))
-			
-
-while len(feuilles) > 0:
-	au_sort = randint(0, len(feuilles)-1)
-	racine += feuilles[au_sort]
-	del feuilles[au_sort]
-	
-
-print(racine.dessin())
->>>>>>> méthode_complexité

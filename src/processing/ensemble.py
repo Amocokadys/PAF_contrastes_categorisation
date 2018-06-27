@@ -39,10 +39,10 @@ class Transfini:
 		return self.__gt__(autre) or self.__eq__(autre)
 	
 	def __lt__(self, autre):
-		return not self.__ge__(self, autre)
+		return not self.__ge__(autre)
 	
 	def __le__(self, autre):
-		return not self.__gt__(self, autre)
+		return not self.__gt__(autre)
 	
 	def __eq__(self, autre):
 		if self.z != 0:
@@ -128,28 +128,7 @@ class Ensemble:
 			if not clef in self.centre:
 				somme += Transfini(0,0,1)
 		return somme
-									
-	
-	def __add__(self, point):
-		
-<<<<<<< HEAD
-		"""actualise l'espérence et la matrice de covariance
-		d'un cluster après l'ajout d'un point, en temps constant par 
-		rapport au nombre
-		de points."""
-		
 
-		for el in self:
-			if el in point:
-				self[el] = (self.nombre_descendant * self[el] + point[el])/(self.nombre_descendant + 1)
-=======
-		"""actualise l'espérence d'un cluster après l'ajout d'un point, en temps constant par 
-		rapport au nombre de points."""
->>>>>>> méthode_complexité
-		
-		
-					
-		return self
-	
+
 	def __iter__(self):
 		return iter(self.centre)

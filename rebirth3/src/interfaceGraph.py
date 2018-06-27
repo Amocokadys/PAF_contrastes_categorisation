@@ -1,4 +1,4 @@
-from tkinter import*
+from tkinter import *
 from PIL import Image, ImageTk
 import main
 import numpy as np
@@ -112,6 +112,7 @@ class Frame_principal (Frame):
   """fonction qui donne la categorie d'un point et ses caractéristiques"""
   data=np.array([float(attribut.get()) for attribut in self.attributs])
   resultat=contrasteur.result(self.mclusters, self.listeContrastes, data)
+  print(resultat)
   champ=Label(self, text="cluster : "+resultat[0][0])
   champ.grid(row=13, column=0)
   champ1=Label(self, text="caractéristiques : "+str(resultat[1]))

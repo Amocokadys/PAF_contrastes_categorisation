@@ -10,15 +10,20 @@ import contrasteur
 
 
 def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
+ """fonction pour enregistrer l'image du cluster de l'objet gmm projetés sur les dimensions colonne1 et colonne2 ainsi que le point. Le graphique est enregistré sur graphique.png"""
  #Visualisation des clusters formés par gmm
  data, centers=gmm.result()
  colorlist= list(matplotlib.colors.cnames.keys())
  random.shuffle(colorlist)
  colorpoints=[]
+ labels=[]
  for p in data.itertuples():
+  #print(type(p))
+  #print(p)
   colorpoints.append(colorlist[p[-1]])
+  #labels.append(p.index[0])
  plt.plot(point[0],point[1],"b:*",markersize=20)
- plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k')
+ plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k',label=labels)
  plt.title('Classification gmm ')
  plt.xlabel(colonne1)
  plt.ylabel(colonne2)
@@ -26,9 +31,10 @@ def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
  plt.clf()
  
 class Frame_principal (Frame):
+ """classe qui permet de construire notre interface graphique"""
  
  def __init__(self,listelabels,mclusters,listeContrastes,mgmm):
-  Frame.__init__(self, borderwidth = 50, bg='red')
+  Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
   self.mclusters=mclusters
   self.listeContrastes=listeContrastes
  
@@ -89,6 +95,7 @@ class Frame_principal (Frame):
   self.buttonGraph.grid(row=0,column=0)
   
  def tracerGraph(self):
+  """appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
   index=[int(self.var_choix.get()[-1]),int(self.var_choix1.get()[-1])]
   point=np.array([float(self.attributs[k].get()) for k in index])
   graphic_clusters_fruits(self.mgmm,str(self.var_choix.get()[:-1]), str(self.var_choix1.get()[:-1]), point)
@@ -102,6 +109,7 @@ class Frame_principal (Frame):
   print(self.var_choix.get(),"coucou")
 
  def fonctionTest(self):
+  """fonction qui donne la categorie d'un point et ses caractéristiques"""
   data=np.array([float(attribut.get()) for attribut in self.attributs])
   resultat=contrasteur.result(self.mclusters, self.listeContrastes, data)
   champ=Label(self, text="cluster : "+resultat[0][0])

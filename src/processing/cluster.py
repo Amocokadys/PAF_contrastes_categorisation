@@ -30,6 +30,7 @@ class Cluster:
         return(np.array(matrice))
     
     
+
     def __init__(self,points,centre,):
         
         if (len(points) == 2) :

@@ -17,32 +17,72 @@ class Transfini:
 	
 	def __init__(self, n = 0, w = 0, z = 0):
 		self.n = n
-		self.w = w
-		self.z = z
+		self.w = int(w)
+		self.z = int(z)
+		self.signe = True
 	
 	def __gt__(self, autre):
-		return (self.w > autre.w) or (self.w == autre.w and self.n > autre.n)
+		if (not self.signe) and autre.signe:
+			return False
+		if (not autre.signe) and self.signe:
+			return True
+		if self.z != 0 or autre.z != 0:
+			return self.signe == (self.z > autre.z)
+		elif self.w != 0 or autre.w != 0:
+			return self.signe == (self.w > autre.w)
+		else:
+			return self.signe == (self.n > autre.n)
+
+
 	
 	def __ge__(self, autre):
-		return (self.w >= autre.w) or (self.w == autre.w and self.n >= autre.n)
+		return self.__gt__(autre) or self.__eq__(autre)
 	
 	def __lt__(self, autre):
-		return (self.w < autre.w) or (self.w == autre.w and self.n < autre.n)
+		return not self.__ge__(self, autre)
 	
 	def __le__(self, autre):
-		return (self.w <= autre.w) or (self.w == autre.w and self.n <= autre.n)
+		return not self.__gt__(self, autre)
 	
 	def __eq__(self, autre):
-		return self.n == autre.n and self.w == autre.w
+		if self.z != 0:
+			return self.z == autre.z
+		elif self.w != 0:
+			return self.w == autre.w
+		else:
+			return autre.n == self.n
+		
 	
 	def _neq__(self, autre):
-		return self.n != autre.n or self.w != autre.w
+		return not self.__eq__(self,autre)
 	
 	def __add__(self,autre):
 		if type(autre) == Transfini:
 			return Transfini(autre.n + self.n, autre.w + self.w, autre.z + self.z)
 		else:
 			return Transfini(autre + self.n, self.w, self.z)
+	
+	def __truediv__(self,nombre):
+		if self.z > 1:
+			return Transfini(self.n,self.w,self.z - 1)
+		elif self.z == 1:
+			return Transfini(self.n, self.w)
+		elif self.w > 1:
+			return Transfini(self.n, self.w - 1)
+		elif self.w == 1:
+			return Transfini(self.n)
+		else:
+			return Transfini(self.n / nombre)
+	
+	def __neg__(self):
+		self.signe = not self.signe
+		return self
+		
+	def __str__(self):
+		if self.signe:
+			return str(self.n) + " + " + str(self.w) + "w + " + str(self.z) + "w2"
+		else:
+			return "- " + str(self.n) + " + " + str(self.w) + "w + " + str(self.z) + "w2"
 	
 	"""def __sub__(self, autre):
 		if self.z < autre.z:
@@ -56,16 +96,16 @@ class Transfini:
 
 class Ensemble:
 	
-	distribution = {}
-	
-	def __init__(self, points):
-		
-		self.points = points
-		self.actualise()
-		self.points = None
+	distribution = {}				
 	
 	def __getitem__(self, clef):
 		return self.centre[clef]
+	
+	def __setitem__(self, clef, val):
+		self.centre[clef] = val
+	
+	def __delitem__(self, clef):
+		del self.centre[clef]
 	
 	def distance(self, point):
 				
@@ -73,10 +113,10 @@ class Ensemble:
 		for clef in self.centre:
 			if clef in point.centre:
 				if Ensemble.distribution[clef] == None:
-					if self[clef] == 0 or point[clef] == 0:
+					if self[clef] <= 0 or point[clef] <= 0:
 						somme += Transfini(0,1)
 					else:
-						somme += math.abs(math.log(self[clef] / point[clef]))
+						somme += abs(math.log(self[clef] / point[clef]))
 				elif Ensemble.distribution[clef] == 0:
 					if point[clef] != self[clef]:
 						somme += Transfini(0,1)
@@ -87,23 +127,12 @@ class Ensemble:
 		for clef in point.centre:
 			if not clef in self.centre:
 				somme += Transfini(0,0,1)
-		return somme			
-	
-	def actualise(self):
-		
-		""" recalcule l'espérance et la matrice de covariance
-		(non valable en mode incr) """
-		
-		self.nombre_descendant = len(self.points)
-		self.centre = np.zeros(self.dimension)
-		
-		for el in self.points:
-			self.centre += el
-		self.centre /= self.nombre_descendant
+		return somme
 									
 	
 	def __add__(self, point):
 		
+<<<<<<< HEAD
 		"""actualise l'espérence et la matrice de covariance
 		d'un cluster après l'ajout d'un point, en temps constant par 
 		rapport au nombre
@@ -113,13 +142,14 @@ class Ensemble:
 		for el in self:
 			if el in point:
 				self[el] = (self.nombre_descendant * self[el] + point[el])/(self.nombre_descendant + 1)
+=======
+		"""actualise l'espérence d'un cluster après l'ajout d'un point, en temps constant par 
+		rapport au nombre de points."""
+>>>>>>> méthode_complexité
 		
-		self.nombre_descendant += 1
 		
-		if self.points != None:
-			self.points.append(point)
 					
 		return self
 	
 	def __iter__(self):
-		return iter(self.points)
+		return iter(self.centre)

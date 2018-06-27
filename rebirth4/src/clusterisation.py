@@ -9,11 +9,10 @@ class Clusterisation:
                   
     result (output) : -list of clusters"""
     
-    def __init__(self, dataframe, arrayCenters, isContrast = False, dimension = None):
+    def __init__(self, dataframe, arrayCenters, isContrast = False):
         self.dataframe = dataframe
         self.arrayCenters = arrayCenters
         self.isContrast = isContrast
-        self.dimension = dimension
 
 
     def dataframeToCluster(self,dataframe,means):
@@ -61,6 +60,8 @@ class Cluster:
         first, segregate the core and the remaining points
         then compute the prototype, and the label
         """
+        del(points['category'])
+        centre = np.delete(centre, -1)
         self.core, self.remaining = self.selectCore(points, centre)
         self.proto = Prototype(self.core)
         self.propDict = {}
@@ -68,23 +69,24 @@ class Cluster:
         self.updateLabel()
         
 
-    def selectCore(self, points, p = 3):
+    def selectCore(self, points, centre, p = 5):
         """
         returns the core of the cluster, ie the elements that, on all directions,
         deviate by a most p standard deviantions
         """
         var = points.std()
         core = pd.DataFrame(columns = points.columns)
-        remaining = pd.DataFrame(columns = points.colums)
-        for _, row in points.iterrows():
+        remaining = pd.DataFrame(columns = points.columns)
+        for idx, row in points.iterrows():
+            new_data = pd.DataFrame([row], columns = core.columns, index = [idx])
             inCore = True
             for i in (row - centre) / var:
                 if i > p:
                     inCore = False
             if inCore:
-                core = core.append(row)
+                core = core.append(new_data)
             else:
-                remaining = remaining.append(row)
+                remaining = remaining.append(new_data)
         return core, remaining
 
 
@@ -103,7 +105,7 @@ class Cluster:
             self.propDict[i] += 1
 
         for key in self.propDict.keys():
-            self.propDict[key] /= len(self.points)
+            self.propDict[key] /= len(self.core)
 
 
     def updateLabel(self):
@@ -122,7 +124,7 @@ class Cluster:
         computes the normalized distance between the point and the center of the
         Cluster
         """
-        return np.norm((point-self.proto.centre)/self.proto.stdDev)
+        return np.linalg.norm((point-self.proto.centre)/self.proto.stdDev)
 
 
     def getContrast(self, point):
@@ -137,6 +139,8 @@ class ContrastCluster(Cluster):
     a contrastCluster differs from a cluster by the computation of the label
     """
     def __init__(self,points,centre):
+        del(points['category'])
+        centre = np.delete(centre, -1)
         self.core, self.remaining = self.selectCore(points, centre)
         self.proto = Prototype(self.core)
         self.label=[]
@@ -144,6 +148,12 @@ class ContrastCluster(Cluster):
         
 
     def updateLabel(self, p = 0.5):
-        for i in len(self.proto.centre):
+        for i in range(len(self.proto.centre)):
             if abs(self.proto.centre.values[i]) > p:
-                self.label.append(self.proto.centre.columns[i],  np.sign(self.proto.centre.values[i]))
+                if self.proto.centre.values[i] > 0:
+                    sgn = '+'
+                else:
+                    sgn = '-'
+                self.label.append(self.core.columns[i] + sgn)
+        print(self.label)
+

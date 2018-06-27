@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 import clusterisation
-
+import contraste
 
 def closest(listCluster, point):
     """
@@ -23,7 +23,7 @@ def closest(listCluster, point):
     distance_min = -1
     clusterMin = None
     for cluster in listCluster :
-        distance_tmp = cluster.distance(element) 
+        distance_tmp = cluster.distance(point) 
         if (distance_tmp < distance_min or distance_min < 0) :
             distance_min = distance_tmp
             clusterMin = cluster
@@ -46,8 +46,7 @@ class Contrasteur:
         returns the labels associated to the clusters
         """
         categoryCluster = closest(self.listCategoryClusters, element)
-        contrast_element = categoryCluster.getContrast(element)
-        # TODO : sharpening
+        contrast_element = contraste.contrastPoint(element, categoryCluster)
         contrastCluster = closest(self.listContrastClusters, contrast_element)
         return categoryCluster, contrastCluster
 

@@ -17,79 +17,52 @@ import math as m
 import gmm
 import clusterisation
 
-class Contraste:
-    
-    def __init__(self,clustersList,critere=0.5,numberCluster=3):
-        self.clustersList=clustersList
-        self.critere=critere
-        self.numberCluster=numberCluster
-        self.infinitiesPoints=[]
-        
-    def difference(self,dataframe,center):
-        """ return the difference between a dataframe and its center """
-        del dataframe['category']
-        diff = (dataframe-center[:len(dataframe.columns)])
-        var=self.variance(dataframe)
-        infinities=[]
-        for j in range(len(var)):
-            if(var[j]==0):
-                infinities.append(j)
-        diffNormal = diff/var
-        for k in dataframe.iterrows():
-            for j in infinities:
-                if(k[1][j]==0):
-                    diffNormal[j][k[0]]=0
-                else:
-                    self.infinitiesPoints.append(diffNormal.loc[k[0]])
-                    diffNormal=diffNormal.drop(axis=1,index=k[0])
-        
-        return diffNormal
-             
-    def variance(self,dataFrame):
-        var=dataFrame.var(axis=0)                  
-        return var
-        
-        
-    def sharpening(self,diff):
-        """ sharps the dataframe in function a critere"""
-        
-        maxiListe = diff.max(axis=1)
-        
-        for k in diff.iteritems():
-            for j in range(len(k[1])):
-                if(abs(k[1][j])<self.critere*maxiListe[j]):
-                    k[1][j]=0
-        
-        return diff
-        
-    def contrast(self):
-        """ reapply gmm on each sharpens cluster """
 
-        newListDatas=[]
-        
-        remainingDatas=[]
+def sharpens(point, p = 0.5):
+    """
+    only selects values from point that are smaller than p
+    """
+    point.mask(abs(point) < p, other = 0, inplace = True)
 
-        for cluster in self.clustersList:
-            diff = self.difference(cluster.core,cluster.prototype.center)
-            sharp = self.sharpening(diff)
-            newListDatas.append(sharp)
-            
-            diff2=self.differenceRemaining(cluster.remaining,cluster.center)
-            sharp2=self.sharpening(diff2)
-            remainingDatas.append(sharp2)
-            
-        newDataFrame=pd.concat(newListDatas) 
-        dataFrameRemaining = pd.concat(remainingDatas)
-            
-        newGmm = gmm.GMM(newDataFrame)
-        lastDataFrame, centers = newGmm.result()
-        clusterObject = clusterisation.Clusterisation(lastDataFrame,centers, isContrast = True,dimension = lastDataFrame.columns[0])
-        listeClusters = clusterObject.result()
-                
-        return listeClusters,dataFrameRemaining
-            
-            
-    def result(self):
-        """ return the dataframe centré réduit sharpené """
-        return self.contrast()
-        
+
+def contrastPoint(point, cluster):
+    """
+    returns the sharpened contrast between a point and a cluster
+    """
+    ctrst = (point - cluster.proto.centre) / cluster.proto.stdDev
+    sharpens(ctrst)
+    return ctrst
+
+
+def constrastList(points, cluster):
+    """
+    returns a dataframe containing the contrasts between the points and
+    the cluster
+    """
+    ctrst = pd.DataFrame(columns = points.columns)
+    for _, row in points.iterrows():
+        ctrst = ctrst.append(contrastPoint(row, cluster), ignore_index = True)
+    return ctrst
+
+
+def ContrastCluster(cluster):
+    """
+    returns the contrasts between the core and the cluster and between the 
+    remaining points and the cluster
+    """
+    coreCtrst = constrastList(cluster.core, cluster)
+    remainingCtrst = constrastList(cluster.remaining, cluster)
+    return coreCtrst, remainingCtrst
+
+
+def contrastClusterlist(clusters):
+    """
+    returns the appended contrasts of all the clusters
+    """
+    coreCtrst = pd.DataFrame(columns = clusters[0].core.columns)
+    remainingCtrst = pd.DataFrame(columns = clusters[0].core.columns)
+    for c in clusters:
+        core, remaining = ContrastCluster(c)
+        coreCtrst = coreCtrst.append(core)
+        remainingCtrst = remainingCtrst.append(remaining)
+    return coreCtrst, remainingCtrst

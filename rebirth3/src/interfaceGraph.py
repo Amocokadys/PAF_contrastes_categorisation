@@ -17,16 +17,17 @@ def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
  random.shuffle(colorlist)
  colorpoints=[]
  labels=[]
- for p in data.itertuples():
+ for k, row in data.iterrows():
   #print(type(p))
   #print(p)
-  colorpoints.append(colorlist[p[-1]])
-  #labels.append(p.index[0])
+  colorpoints.append(colorlist[row[len(row)-1].astype(int)])
+  labels.append(k)
  plt.plot(point[0],point[1],"b:*",markersize=20)
  plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k',label=labels)
  plt.title('Classification gmm ')
  plt.xlabel(colonne1)
  plt.ylabel(colonne2)
+ plt.legend()
  plt.savefig('graphique.png')
  plt.clf()
  

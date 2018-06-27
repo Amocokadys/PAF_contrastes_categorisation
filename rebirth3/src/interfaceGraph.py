@@ -7,7 +7,7 @@ import matplotlib
 import random
 import gmm
 import contrasteur
-
+ 
 
 def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
  """fonction pour enregistrer l'image du cluster de l'objet gmm projetés sur les dimensions colonne1 et colonne2 ainsi que le point. Le graphique est enregistré sur graphique.png"""
@@ -142,9 +142,58 @@ class FrameIncrementale(Frame):
    v.set(listeOptions[0])
    om = OptionMenu(self, v, *listeOptions)
    om.grid(row=k, column=1)
+   
+   
+  image = Image.open("graphique.png") #TODO remplacer par la bonne image initiale
+  self.photo = ImageTk.PhotoImage(image)
+  espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  espace_image.grid(row=0, column=0,rowspan=10)
+  espace_image.create_image(323, 242, image =self.photo)
+  self.attributs=[]
+  for k in range(10):
+   var_texte = StringVar()
+   ligne_texte = Entry(self, textvariable=var_texte, width=30)
+   self.attributs.append(var_texte)
+   ligne_texte.grid(row=k,column=2)
+   
+  self.buttonInsert=Button(self, text="resultat", command= self.fonctionInsertion)
+  self.buttonNom=Button(self, text="resultat", command= self.fonctionNom)
+  
+  
+  arborescence.Arbre.distribution = [None, None, None]#TODO Louis initialiser
+  self.monArbre = arborescence.Arbre([])
+  
+  
+ champ_label = Label(self, text="donnez le nom de votre objet : ")
+ champ_label.grid(row=11,column=0)
+ var_texte = StringVar()
+ ligne_texte = Entry(self, textvariable=var_texte, width=30)
+ ligne_texte.grid(row=11,column=1)
+ 
+ 
+ 
+ def fonctionInsertion(self):
+  test += Feuille(self.attributs)#TODO Louis inserer l objet
+  
+ def fonctionNom(self):
+  #TODO Louis donner le nom à l objet
+  
+  
+ def retracerGraph(self):
+  """appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
+  #TODO recreer l image puis la remplacer dans ce qu on affiche
+  image = Image.open("graphique.png") 
+  self.photo = ImageTk.PhotoImage(image)
+  espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  espace_image.grid(row=1, column=0,rowspan=10)
+  espace_image.create_image(323, 242, image =self.photo)
   
 class ApplicationInterface(Frame):
  def __init__(self,listelabels):
   Frame.__init__(self)
   partie_principale =  FrameIncrementale(listelabels)
   partie_principale.grid()
+<<<<<<< HEAD
+=======
+  
+>>>>>>> interface methode incrementale a modifier par Louis

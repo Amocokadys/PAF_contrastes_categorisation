@@ -18,7 +18,7 @@ import clusterisation
 
 class Contraste:
     
-    def __init__(self,clustersList,critere=0.5,numberCluster=15):
+    def __init__(self,clustersList,critere=0.2,numberCluster=15):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
@@ -28,7 +28,7 @@ class Contraste:
         dataframe = cluster.getDataFrame()
         del dataframe['category']
         center = cluster.getCenter()
-        diff = (dataframe-center)/self.variance(dataframe)
+        diff = abs(dataframe-center)/self.variance(dataframe)
         return diff
              
     def variance(self,dataFrame):
@@ -36,17 +36,19 @@ class Contraste:
         
         
     def sharpening(self,diff):
-        """ sharpenins the dataframe depending on a criteria"""
+        """ sharps the dataframe in function a critere"""
+        
+        maxiListe = diff.max(axis=0)
         
         for k in diff.iterrows():
             for j in range(len(k[1])):
-                if(abs(k[1][j])<self.critere):
+                if(k[1][j]<self.critere*maxiListe[j]):
                     k[1][j]=0  
                 
         return diff
         
     def contrast(self):
-        """ reapply gmm on each sharpened cluster """
+        """ reapply gmm on each sharpens cluster """
 
         newListDatas=[]
 

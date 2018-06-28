@@ -47,7 +47,7 @@ def main(filename, point):
 
 
 if __name__ == "__main__":
-    data = np.array([20, 10, 222, 41, 22, 220, 94, 1.2])
+    data = np.array([20, 10, 222, 41, 22, 220, 94, 1.2]) # the test data to be classified
     
     res = main("../data/fruitsModifiedAdjectives.csv", data)
     print(*res)

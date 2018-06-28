@@ -20,7 +20,7 @@ def result(clustersCategories, clustersContrast, element) :
     """ on attribue à element le cluster dont il est le plus proche du centre """
     distance_min = -1
     for cluster in clustersCategories :
-        distance_tmp = cluster.distance(element)
+        distance_tmp = distanceEuclidienne(cluster.centre, element)
         if (distance_tmp < distance_min or distance_min < 0) :
             distance_min = distance_tmp
             cluster_category = cluster
@@ -29,13 +29,11 @@ def result(clustersCategories, clustersContrast, element) :
     
     """ on attribue à element la liste de labels associé au cluster de contrastes
     dans lequel il se trouve s'il en est assez proche en nombre d'écarts-types """
-    
-    constrast_element = #TODO
 
     adjectifs = "pas d'adjectif pertinent trouvé"
     distance_min = -1
     for cluster in clustersContrast :
-        distance_tmp = cluster.distance(#TODO)
+        distance_tmp = distanceEuclidienne(cluster.centre, element)
         """ si une des composantes de la différence entre element et le centre du cluster
             dépasse 3 variances, alors la condition n'est pas remplie """
         if (distance_tmp < distance_min or (distance_min < 0 and assezProche(element, cluster))) :

@@ -18,7 +18,7 @@ import clusterisation
 
 class Contraste:
     
-    def __init__(self,clustersList,critere=0.5,numberCluster=3):
+    def __init__(self,clustersList,critere=0.5,numberCluster=15):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
@@ -28,7 +28,7 @@ class Contraste:
         dataframe = cluster.getDataFrame()
         del dataframe['category']
         center = cluster.getCenter()
-        diff = abs(dataframe-center)/self.variance(dataframe)
+        diff = (dataframe-center)/self.variance(dataframe)
         return diff
              
     def variance(self,dataFrame):
@@ -36,38 +36,36 @@ class Contraste:
         
         
     def sharpening(self,diff):
-        """ sharpens the dataframe depending on a criteria """
-        
-        maxiListe = diff.max(axis=0)
+        """ sharpenins the dataframe depending on a criteria"""
         
         for k in diff.iterrows():
-            for j in range(len(k)):
-                if(k[1][j]<self.critere*maxiListe[j]):
+            for j in range(len(k[1])):
+                if(abs(k[1][j])<self.critere):
                     k[1][j]=0  
                 
         return diff
         
     def contrast(self):
-        """ reapply kmean on each sharpens cluster """
+        """ reapply gmm on each sharpened cluster """
+
+        newListDatas=[]
 
         for cluster in self.clustersList:
             diff = self.difference(cluster)
             sharp = self.sharpening(diff)
-            #concaténer
+            newListDatas.append(sharp)
+        newDataFrame=pd.concat(newListDatas) 
             
-        #gmmsur tout 
-        newGmm = gmm.GMM(sharp,self.numberCluster)
-        newDataFrame, centers = newGmm.result()
-       
-        clusterObject = clusterisation.Clusterisation(newDataFrame, centers)
-        listClusters = clusterObject.result()
-
-        return listClusters
         
-            #print(diff)
+        newGmm = gmm.GMM(newDataFrame,self.numberCluster)
+        dataFrame, centers = newGmm.result()
+        clusterObject = clusterisation.Clusterisation(dataFrame,centers, isContrast = True)
+        listeClusters = clusterObject.result()
+        
+        return listeClusters
             
             
     def result(self):
         """ return the dataframe centré réduit sharpené """
-        self.contrast()
-        return self.clustersList
+        return self.contrast()
+        

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from constantes import *
 
 class Clusterisation:
     """methods :
@@ -69,19 +70,19 @@ class Cluster:
         self.updateLabel()
         
 
-    def selectCore(self, points, centre, p = 5):
+    def selectCore(self, points, centre):
         """
         returns the core of the cluster, ie the elements that, on all directions,
         deviate by a most p standard deviantions
         """
-        var = points.std()
+        var = points.std() + EPSILON
         core = pd.DataFrame(columns = points.columns)
         remaining = pd.DataFrame(columns = points.columns)
         for idx, row in points.iterrows():
             new_data = pd.DataFrame([row], columns = core.columns, index = [idx])
             inCore = True
             for i in (row - centre) / var:
-                if i > p:
+                if i > CORE_PARAM:
                     inCore = False
             if inCore:
                 core = core.append(new_data)

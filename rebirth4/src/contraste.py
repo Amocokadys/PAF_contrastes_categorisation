@@ -17,12 +17,13 @@ import math as m
 import gmm
 import clusterisation
 
+from constantes import *
 
-def sharpens(point, p = 0.5):
+def sharpens(point):
     """
     only selects values from point that are smaller than p
     """
-    point.mask(abs(point) < p, other = 0, inplace = True)
+    point.mask(abs(point) < SHARPEN_PARAM, other = 0, inplace = True)
 
 
 def contrastPoint(point, cluster):

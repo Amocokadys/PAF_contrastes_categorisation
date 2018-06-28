@@ -84,6 +84,7 @@ class Frame_principal (Frame):
   image = Image.open("graphique.png") 
   self.photo = ImageTk.PhotoImage(image)
   espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  print(image.size)
   espace_image.grid(row=1, column=0,rowspan=10)
   espace_image.create_image(323, 242, image =self.photo)
   
@@ -163,11 +164,11 @@ class FrameIncrementale(Frame):
   self.monArbre = arborescence.Arbre([])
   
   
- champ_label = Label(self, text="donnez le nom de votre objet : ")
- champ_label.grid(row=11,column=0)
- var_texte = StringVar()
- ligne_texte = Entry(self, textvariable=var_texte, width=30)
- ligne_texte.grid(row=11,column=1)
+  champ_label = Label(self, text="donnez le nom de votre objet : ")
+  champ_label.grid(row=11,column=0)
+  var_texte = StringVar()
+  ligne_texte = Entry(self, textvariable=var_texte, width=30)
+  ligne_texte.grid(row=11,column=1)
  
  
  
@@ -176,7 +177,7 @@ class FrameIncrementale(Frame):
   
  def fonctionNom(self):
   #TODO Louis donner le nom à l objet
-  
+  pass
   
  def retracerGraph(self):
   """appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
@@ -185,7 +186,7 @@ class FrameIncrementale(Frame):
   self.photo = ImageTk.PhotoImage(image)
   espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
   espace_image.grid(row=1, column=0,rowspan=10)
-  espace_image.create_image(323, 242, image =self.photo)
+  espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
   
 class ApplicationInterface(Frame):
  def __init__(self,listelabels):

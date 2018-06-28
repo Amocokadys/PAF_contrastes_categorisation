@@ -1,0 +1,6 @@
+livres/*
+/données_livres.csv
+
+*/__pycache__/
+
+*.pyc

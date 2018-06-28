@@ -1,0 +1,56 @@
+Battalia3 is an artificial dataset created using the exoplanet random generator from the online game Battalia.fr
+This data set describes 2000 randomly generated exoplanets with 27 numerical attributes and their associated class.
+
+Attributes:
+- StarSpctr [INT]: Spectral type of the star the planet is orbiting
+	1 : Type O
+	2 : Type B 
+	3 : Type A
+	4 : Type F
+	5 : Type G
+	6 : Type K
+	7 : Type M
+	8 : Type L
+	9 : Type T
+	10 : Type Y and beyond
+- OtherPlanets [INT]: Number fo other planets in the same solar system
+- Position [INT]: Relative position in the system between position 1 and 10, counting empty orbits.
+- SemiMajorAxis [FLOAT]: Semi-major axis in AU.
+- OrbitalExc [FLOAT]: Orbital excentricity
+- OrbitalInc [FLOAT]: Absolute orbital inclination compared with the star orbital axis
+- OrbitalPeriod [FLOAT] : Numbers of days required to orbit the star
+- AxisIncl [FLOAT]: Planet axis inclination
+- Moons [INT]: Number of moons
+- Diameter [INT]: Planet diameter
+- Density [INT]: Planet density 
+- Magnetosphere [FLOAT]: Strength of the magnetosphere (reference: Earth=100.0) 
+- AtmPressure [FLOAT]: Atmospheric pressure (KPa)
+- Albedo [FLOAT]: Bond albedo
+- DayPeriod [FLOAT]: Lenght of the planet self-rotation in days.
+- Tmin [INT]: Minimal temperature (in degree celsius)
+- Tmax [INT]: Maximal temperature (in degree celsius)
+- Pxxx : Atmosphere partial pressure between 0 and 100 [FLOAT] : H2O, He, CH4, H2, N2, O2, Ar, CO2, SO2, K 
+- Type [CHAR]: class of the observed planet
+	- "r" : rocky world
+	- "g" : gas planet
+	- "l" : lava world
+	- "t" : terrestrial world
+	- "d" : desert planet
+	- "i" : ice world
+
+	
+Similarity tree between the different types:	
+	
+  r,g,l,t,d,i
+ /           \
+g	      r,l,t,d,i
+         /         \ 
+        r        l,t,d,i
+				/	    \
+               l       t,d,i
+		              /  |  \
+		             d   i   t
+				   
+Generation methodology:	
+The spectral type of the star, the relative position in the system, the density and the diameter are randomly generated. From there a likely planet type is decided at random. 
+All other attributes are generated or computed according to distributions based on these first attributes.

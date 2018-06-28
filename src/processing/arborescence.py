@@ -38,6 +38,7 @@ class Feuille(Ensemble):
 	commentaire = 0
 		
 	def __init__(self, point, titre = ""):
+		self.cherche_contraste = False
 		self.nombre_descendant = 1
 		self.titre = titre
 		self.centre = point
@@ -55,7 +56,8 @@ class Feuille(Ensemble):
 		return iter(self.centre)
 	
 	def __add__(self, point):
-		self.recherche_contraste([self])
+		if point.cherche_contraste:
+			point.recherche_contraste([self])
 		return Arbre([self, point])
 	
 	def __str__(self):
@@ -66,31 +68,30 @@ class Feuille(Ensemble):
 			contraste_max = 0
 			contraste_max_second = 0
 			dim_contraste = ""
-			dim_contraste_second = ""
-			for dimension in sel:
+			for dimension in self:
 				if dimension in elt:
 					contraste_courant = selfie[dimension] - elt[dimension]
 					if abs(contraste_courant)>abs(contraste_max):
-						dim_contraste_second = dim_contraste
 						contraste_max_second = contraste_max
 						dim_contraste = dimension
 						contraste_max = contraste_courant
 					elif abs(contraste_courant)>abs(contraste_max_second):
-						dim_contraste_second = dimension
 						contraste_max_second = contraste_courant
 	                                        
 				return (dim_contraste, contraste_max, contraste_max_second)
 		max_contraste, max_dimension = argmax_(feuil, key= lambda x:-sharpening(self, x)[2])
+				
+		contraste = sharpening(self,max_dimension)
 		
 		commentaire = feuil[max_contraste].titre
-		if Ensemble.mauvais[max_dimension[0]] == "à":
-			commentaire += " à " + self[max_dimension[0]] + " " + max_dimension[0]
-		elif max_dimension[2] * 3 > max_dimension[1]:
+		if Ensemble.mauvais[contraste[0]] == "à":
+			commentaire += " à " + self[contraste[0]] + " " + contraste[0]
+		elif contraste[2] * 3 > contraste[1]:
 			commentaire = "sorte de " + commentaire
-		elif max_dimension[1] > 0:
-			commentaire += Ensemble.bon[max_dimension[0]]
+		elif contraste[1] > 0:
+			commentaire += Ensemble.bon[contraste[0]]
 		else:
-			commentaire += Ensemble.mauvais[max_dimension[0]]
+			commentaire += Ensemble.mauvais[contraste[0]]
 		Feuille.commentaire = commentaire
 			
 		
@@ -150,8 +151,8 @@ class Arbre(Ensemble):
 			
 			self.enfants.append(livre)
 			
-
-			livre.recherche_contraste(self._private_liste_points())
+			if livre.cherche_contraste:
+				livre.recherche_contraste(self._private_liste_points())
 								
 			#self.regroupement()
 		
@@ -264,10 +265,7 @@ class Arbre(Ensemble):
 		return texte
 		
 
-
-	
-
-if __name__ == "__main__":
+def lire_csv():
 	racine = Arbre([], "~")
 	feuilles = []
 	predistribution = []
@@ -276,15 +274,23 @@ if __name__ == "__main__":
 		cursor = csv.reader(fichier, delimiter=",")
 		
 		for ligne in cursor:
-			if len(predistribution) == 0:
+			if ligne[0] == "critère":
 				predistribution = ligne[1:]
-			elif len(Ensemble.distribution) == 0:
+			elif ligne[0] == "mode":
 				for i in range(len(predistribution)):
 					if ligne[i+1] == "none":
 						Ensemble.distribution[predistribution[i]] = None
+					elif "/" in ligne[i+1]:
+						Ensemble.distribution[predistribution[i]] = ligne[i+1].split("/")
 					else:
 						print("-",ligne[i],"-")
 						Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
+			elif ligne[0] == "mauvais":
+				for i in range(len(predistribution)):
+					Ensemble.mauvais[predistribution[i]] = ligne[i+1]
+			elif ligne[0] == "bon":
+				for i in range(len(predistribution)):
+					Ensemble.bon[predistribution[i]] = ligne[i+1]
 			else:
 				dico = {}
 				for i in range(1, len(ligne)):
@@ -298,4 +304,16 @@ if __name__ == "__main__":
 		racine += feuilles[au_sort]
 		del feuilles[au_sort]
 	
-	racine.dessin()
+	return racine, predistribution
+	
+	
+#if __name__ == "__main__":
+racine, predistribution = lire_csv()
+racine.dessin()
+
+rat = Feuille({"taille (cm)" : 10, "pattes" : 4, "vitesse de marche (m/s)" : 0.3,\
+			    "régime alimentaire" : 0, "durée de vie (années)" : 3}, "rat")
+
+rat.cherche_contraste = True
+racine += rat
+print(Feuille.commentaire)

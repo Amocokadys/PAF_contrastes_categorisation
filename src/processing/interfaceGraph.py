@@ -7,7 +7,7 @@ import random
 import gmm
 import csv
 import contrasteur
-from arborescence import Arbre, Feuille
+from arborescence import Arbre, Feuille, lire_csv
 from ensemble import Ensemble
 
 
@@ -143,33 +143,7 @@ class FrameIncrementale(Frame):
 		feuilles = []
 		predistribution = []
 		
-		with open("../../jeux de donne/fruits_transfinis.csv", "r") as fichier:
-			cursor = csv.reader(fichier, delimiter=",")
-			
-			for ligne in cursor:
-				if len(predistribution) == 0:
-					predistribution = ligne[1:]
-				elif len(Ensemble.distribution) == 0:
-					for i in range(len(predistribution)):
-						if ligne[i+1] == "none":
-							Ensemble.distribution[predistribution[i]] = None
-						else:
-							print("-",ligne[i],"-")
-							Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
-				else:
-					dico = {}
-					for i in range(1, len(ligne)):
-						if len(ligne[i]) > 0:
-							dico[predistribution[i-1]] = float(ligne[i])
-					feuilles.append(Feuille(dico, ligne[0]))
-					
-		
-		while len(feuilles) > 0:
-			au_sort = random.randint(0, len(feuilles)-1)
-			racine += feuilles[au_sort]
-			del feuilles[au_sort]
-		self.monArbre = racine
-		
+		self.monArbre, predistribution = lire_csv()
 		
 		Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
 		for k in range(10):

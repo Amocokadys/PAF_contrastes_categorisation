@@ -96,7 +96,9 @@ class Transfini:
 
 class Ensemble:
 	
-	distribution = {}				
+	distribution = {}
+	mauvais = {}
+	bon = {}		
 	
 	def __getitem__(self, clef):
 		return self.centre[clef]
@@ -117,7 +119,7 @@ class Ensemble:
 						somme += Transfini(0,1)
 					else:
 						somme += abs(math.log(self[clef] / point[clef]))
-				elif Ensemble.distribution[clef] == 0:
+				elif type(Ensemble.distribution[clef]) == list or Ensemble.distribution[clef] == 0:
 					if point[clef] != self[clef]:
 						somme += Transfini(0,1)
 				else:

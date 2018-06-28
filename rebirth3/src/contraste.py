@@ -89,6 +89,7 @@ class Contraste:
         for k in range(len(newDataFrame.columns)):    
             zeroDatas = self.putZeros(newDataFrame,k)
             miniFrame,minimum=self.mini(zeroDatas,k)
+            print(miniFrame)
             newGmm = gmm.GMM(miniFrame,self.numberCluster)
             dataFrame, centers = newGmm.result()
             lastDataFrame=self.soustractMin(dataFrame,minimum,k)

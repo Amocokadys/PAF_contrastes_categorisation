@@ -53,6 +53,7 @@ class Feuille(Ensemble):
 		return iter(self.centre)
 	
 	def __add__(self, point):
+		self.recherche_contraste([self])
 		return Arbre([self, point])
 	
 	def __str__(self):
@@ -130,7 +131,11 @@ class Arbre(Ensemble):
 		
 		if min_distance.distance(livre) > self.variance / 2:
 			
-			self.enfants.append(livre)						
+			self.enfants.append(livre)
+			
+
+			livre.recherche_contraste(self._private_liste_points())
+								
 			#self.regroupement()
 		
 		else:			

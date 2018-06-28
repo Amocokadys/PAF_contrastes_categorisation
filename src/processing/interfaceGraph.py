@@ -213,12 +213,19 @@ class FrameIncrementale(Frame):
 	# fonctions des boutons
 	
 	def fonctionInsertion(self):
-		alea = ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(5)])
+		alea = "votre animal"
 		self.monArbre += Feuille(self.attributs, alea)
+		self.retracerGraph()
 		
 	def fonctionNom(self):
-		#TODO Louis donner le nom à l objet
-		pass
+		nom = input("votre animal est un ...")
+		liste = self.monArbre._private_liste_points()
+		for feuil in liste:
+			if feuil.titre == "votre animal":
+				feuil.titre = nom
+				self.retracerGraphph()
+				return
+		print("animal non trouvé")
 		
 	def retracerGraph(self):
 		"""appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""

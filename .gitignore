@@ -1,7 +1,9 @@
 livres/*
 /données_livres.csv
 
-*/__pycache__/
+/__pycache__/
 
 *.pyc
 rebirth3/src/graphique.png
+
+rebirth/src/__pycache__/

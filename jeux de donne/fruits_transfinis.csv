@@ -1,0 +1,26 @@
+fruit,taille,noyau,pépins,peau,coque,quartiers,allongement
+,none,0,10,none,none,10,5
+pomme,8,0,7,1,,,1
+poire,9,0,4,2,,,1.5
+abricot,4,1,,2,,,1.5
+cerise,2,1,,1,,,1
+citron,6,0,5,3,,1,1.5
+orange,10,0,10,5,,8,1
+noix,4,0,,,3,,2
+noisette,1,0,,,2,,1
+pomme de terre,8,0,,1,,,2
+carotte,3,0,,1,,,5
+pêche,6,1,,2,,,1
+amande,1,0,,0.4,,,2
+nachi,9,0,,1,,,1
+raisin,2,0,3,1,,,1
+fraise,3,0,,,,,2
+framboise,1,0,,,,,1
+cassis,0.5,0,1,1,,,1
+groseille,0.4,0,1,1,,,1
+chou,15,0,,,,,1.5
+châtaigne,,,,,,,
+kiwi,5,,20,2,,,2
+banane,3,,,3,,,7
+pastèque,50,,20,5,,,1
+melon,12,,100,3,,,1

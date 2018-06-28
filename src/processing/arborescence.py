@@ -34,6 +34,8 @@ def argmax_(liste,key=lambda x:x):
 class Feuille(Ensemble):
 	
 	""" classe correspondant à une donnée"""
+	
+	commentaire = 0
 		
 	def __init__(self, point, titre = ""):
 		self.nombre_descendant = 1
@@ -58,25 +60,40 @@ class Feuille(Ensemble):
 	
 	def __str__(self):
 		return self.titre
-
-	def sharpening(self, elt):
-                contraste_max = 0
-                contraste_max_second = 0
-                dim_contraste = ""
-                dim_contraste_second = ""
-                for dimension in sel:
-                        if dimension in elt:
-                                contraste_courant = self[dimension] - elt[dimension]
-                                if abs(contraste_courant)>abs(contraste_max):
-                                        dim_contraste_second = dim_contraste
-                                        contraste_max_second = contraste_max
-                                        dim_contraste = dimension
-                                        contraste_max = contraste_courant
-                                elif abs(contraste_courant)>abs(contraste_max_second):
-                                        dim_contraste_second = dimension
-                                        contraste_max_second = contraste_courant
-                                        
-                return (dim_contraste, contraste_max, contraste_max_second)
+	
+	def recherche_contraste(self,feuil):
+		def sharpening(selfie, elt):
+			contraste_max = 0
+			contraste_max_second = 0
+			dim_contraste = ""
+			dim_contraste_second = ""
+			for dimension in sel:
+				if dimension in elt:
+					contraste_courant = selfie[dimension] - elt[dimension]
+					if abs(contraste_courant)>abs(contraste_max):
+						dim_contraste_second = dim_contraste
+						contraste_max_second = contraste_max
+						dim_contraste = dimension
+						contraste_max = contraste_courant
+					elif abs(contraste_courant)>abs(contraste_max_second):
+						dim_contraste_second = dimension
+						contraste_max_second = contraste_courant
+	                                        
+				return (dim_contraste, contraste_max, contraste_max_second)
+		max_contraste, max_dimension = argmax_(feuil, key= lambda x:-sharpening(self, x)[2])
+		
+		commentaire = feuil[max_contraste].titre
+		if Ensemble.mauvais[max_dimension[0]] == "à":
+			commentaire += " à " + self[max_dimension[0]] + " " + max_dimension[0]
+		elif max_dimension[2] * 3 > max_dimension[1]:
+			commentaire = "sorte de " + commentaire
+		elif max_dimension[1] > 0:
+			commentaire += Ensemble.bon[max_dimension[0]]
+		else:
+			commentaire += Ensemble.mauvais[max_dimension[0]]
+		Feuille.commentaire = commentaire
+			
+		
 
 class Arbre(Ensemble):
 			

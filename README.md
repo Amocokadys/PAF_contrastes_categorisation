@@ -1,4 +1,4 @@
-# PAF_contrastes_categorisation
+﻿# PAF_contrastes_categorisation
 
 ## Contexte du projet
 
@@ -18,4 +18,4 @@ Nous avons fait quatres versions de la première phase.
 Pour executer une de ces versions, allez dans le répertoire version_x/src, executer le fichier main.py (par exemple, en ligne de commande, tappez `python main.py`)
 Seule la version trois possède une interface graphique
 
-Pour executer ces versions, vous aurrez besoin des bibliothèques : numpy, pandas, sklearn, 
+Pour executer ces versions, vous aurrez besoin des bibliothèques : numpy, matplotlib, scipy, pandas, sklearn, pillow

@@ -48,4 +48,7 @@ if __name__ == "__main__":
     data = np.array([10, 10, 222, 41, 22, 220, 94, 1.2]) # the test point to be classified
     
     cat, adj = main("../data/fruitsModifiedAdjectives.csv", 10, data)
+    
+
+    
     print(cat, adj)

@@ -49,4 +49,7 @@ if __name__ == "__main__":
     #print(*main("../data/fruitsModified.csv", 10, data), sep = '\n')
     
     cat, adj = main("../data/fruitsModifiedAdjectives.csv", 10, data)
+    
+
+    
     print(cat, adj)

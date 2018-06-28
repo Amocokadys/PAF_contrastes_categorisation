@@ -58,6 +58,25 @@ class Feuille(Ensemble):
 	def __str__(self):
 		return self.titre
 
+	def sharpening(self, elt):
+                contraste_max = 0
+                contraste_max_second = 0
+                dim_contraste = ""
+                dim_contraste_second = ""
+                for dimension in sel:
+                        if dimension in elt:
+                                contraste_courant = self[dimension] - elt[dimension]
+                                if abs(contraste_courant)>abs(contraste_max):
+                                        dim_contraste_second = dim_contraste
+                                        contraste_max_second = contraste_max
+                                        dim_contraste = dimension
+                                        contraste_max = contraste_courant
+                                elif abs(contraste_courant)>abs(contraste_max_second):
+                                        dim_contraste_second = dimension
+                                        contraste_max_second = contraste_courant
+                                        
+                return (dim_contraste, contraste_max, contraste_max_second)
+
 class Arbre(Ensemble):
 			
 	nombre_instance = 0

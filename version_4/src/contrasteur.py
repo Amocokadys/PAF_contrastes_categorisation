@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jun 22 11:56:53 2018
+Organisme de référence …… : Télécom ParisTech (https://www.telecom-paristech.fr/)
+Contexte du projet ……………… : Projet PAF (https://paf.telecom-paristech.fr/)
+Sujet ………………………………………………… : Contraste et catégorisation (http://teaching.dessalles.fr/Projects/P18051801.html)
+Auteurs …………………………………………… : Bastien Vagne, Louis Penet de Monterno, Benoît Malézieux,Clément Bonet, Aurélien Blicq, Antoine Bellami
+Date …………………………………………………… : 19/06/2018
+Description du fichier …… : Cartouche
+"""
 
-@author: Antoine, Aurélien
-
+"""
 this file contains methods to classify an new element using the knowledge
 brought by the clusterisation of the dataset
 gives a category and a contrast category

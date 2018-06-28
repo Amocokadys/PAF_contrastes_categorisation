@@ -42,7 +42,7 @@ class Contraste:
         
         for k in diff.iterrows():
             for j in range(len(k[1])):
-                if(k[1][j]<self.critere*maxiListe[j]):
+                if(abs(k[1][j])<self.critere*maxiListe[j]):
                     k[1][j]=0  
                 
         return diff

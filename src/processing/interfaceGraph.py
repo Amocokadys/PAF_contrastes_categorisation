@@ -222,7 +222,7 @@ class FrameIncrementale(Frame):
 		self.photo = ImageTk.PhotoImage(image)
 		espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
 		espace_image.grid(row=1, column=0,rowspan=10)
-		espace_image.create_image(323, 242, image =self.photo)
+		espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
 		
 class ApplicationInterface(Frame):
 	def __init__(self):

@@ -1,3 +1,6 @@
 livres/*
 /données_livres.csv
-*/__pycache__
+
+*/__pycache__/
+
+*.pyc

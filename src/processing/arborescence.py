@@ -291,6 +291,8 @@ def lire_csv():
 			elif ligne[0] == "bon":
 				for i in range(len(predistribution)):
 					Ensemble.bon[predistribution[i]] = ligne[i+1]
+			elif ligne[0] == "obligatoire":
+					Ensemble.obligatoire = ligne[1:]
 			else:
 				dico = {}
 				for i in range(1, len(ligne)):
@@ -307,13 +309,13 @@ def lire_csv():
 	return racine, predistribution
 	
 	
-#if __name__ == "__main__":
-racine, predistribution = lire_csv()
-racine.dessin()
-
-rat = Feuille({"taille (cm)" : 10, "pattes" : 4, "vitesse de marche (m/s)" : 0.3,\
-			    "régime alimentaire" : 0, "durée de vie (années)" : 3}, "rat")
-
-rat.cherche_contraste = True
-racine += rat
-print(Feuille.commentaire)
+if __name__ == "__main__":
+	racine, predistribution = lire_csv()
+	racine.dessin()
+	
+	rat = Feuille({"taille (cm)" : 10, "pattes" : 4, "vitesse de marche (m/s)" : 0.3,\
+				    "régime alimentaire" : 0, "durée de vie (années)" : 3}, "rat")
+	
+	rat.cherche_contraste = True
+	racine += rat
+	print(Feuille.commentaire)

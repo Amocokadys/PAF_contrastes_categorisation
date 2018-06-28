@@ -144,30 +144,61 @@ class FrameIncrementale(Frame):
 		predistribution = []
 		
 		self.monArbre, predistribution = lire_csv()
+
 		
 		Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
-		for k in range(10):
+		
+		
+		
+		#liste des champs
+		boolList=Ensemble.obligatoire
+		nombreObligatoires=0
+		ligneCourante=11
+		listeNonObligatoires=[]
+		self.attributs=[]
+		for k in range(len(boolList)):
+			if boolList[k]:
+				v = StringVar()
+				v.set(predistribution[k])
+				champ_label = Label(self, text=predistribution[k])
+				champ_label.grid(row=LigneCourante,column=0)
+				ligneCourante+=1
+				if "/" in Ensemble.distribution[k]:
+					om = OptionMenu(self, v,Ensemble.distribution[k] )
+					self.attributs.append(om)
+					om.grid(row=LigneCourante, column=2)
+				else:
+					ligne_texte = Entry(self, textvariable=var_texte, width=30)
+					self.attributs.append(var_texte)
+					ligne_texte.grid(row=LigneCourante,column=2)
+			else:
+				listeNonObligatoire.append(predistribution[k])
+		
+		
+		for k in range(4):
 			v = StringVar()
-			v.set(predistribution[0])
-			om = OptionMenu(self, v, *predistribution)
-			om.grid(row=k+1, column=1)
+			v.set(listeNonObligatoires[0])
+			om = OptionMenu(self, v, *listeNonObligatoire)
+			om.grid(row=k+LigneCourante, column=1)
+			var_texte = StringVar()
+			ligne_texte = Entry(self, textvariable=var_texte, width=30)
+			self.attributs.append(var_texte)
+			ligne_texte.grid(row=k+LigneCourante,column=2)
 			
 			
-		image = Image.open("/tmp/graphviz.png") #TODO remplacer par la bonne image initiale
+			
+		#image initiale
+		image = Image.open("/tmp/graphviz.png")
 		self.photo = ImageTk.PhotoImage(image)
 		espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
 		espace_image.grid(row=0, column=0, columnspan=10)
 		espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
-		self.attributs=[]
-		for k in range(10):
-			var_texte = StringVar()
-			ligne_texte = Entry(self, textvariable=var_texte, width=30)
-			self.attributs.append(var_texte)
-			ligne_texte.grid(row=k+1,column=2)
+			
 			
 		self.buttonInsert=Button(self, text="resultat", command= self.fonctionInsertion)
+		self.buttonInsert.grid(row=12, column=1)
 		self.buttonNom=Button(self, text="resultat", command= self.fonctionNom)
-		
+		self.buttonInsert.grid(row=11, column=3)
 				
 		
 		
@@ -178,11 +209,12 @@ class FrameIncrementale(Frame):
 		ligne_texte = Entry(self, textvariable=var_texte, width=30)
 		ligne_texte.grid(row=11,column=1)
 	
-	# 
+	
+	# fonctions des boutons
 	
 	def fonctionInsertion(self):
 		alea = ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(5)])
-		self.monArbre += Feuille(self.attributs, alea)#TODO Louis inserer l objet
+		self.monArbre += Feuille(self.attributs, alea)
 		
 	def fonctionNom(self):
 		#TODO Louis donner le nom à l objet
@@ -190,7 +222,6 @@ class FrameIncrementale(Frame):
 		
 	def retracerGraph(self):
 		"""appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
-		#TODO recreer l image puis la remplacer dans ce qu on affiche
 		racine.dessin("*")
 		image = Image.open("/tmp/graphviz.png") 
 		self.photo = ImageTk.PhotoImage(image)

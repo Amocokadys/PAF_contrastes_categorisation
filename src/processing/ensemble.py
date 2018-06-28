@@ -99,6 +99,7 @@ class Ensemble:
 	distribution = {}
 	mauvais = {}
 	bon = {}		
+	obligatoire = []
 	
 	def __getitem__(self, clef):
 		return self.centre[clef]

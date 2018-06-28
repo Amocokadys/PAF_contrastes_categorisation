@@ -12,5 +12,12 @@ Description du fichier …… : Cartouche
 
 # this parameter corresponds to the number bellow which a component of a contrast
 # is set to zero during the sharpening
-
 SHARPEN_PARAM = 0.5
+
+# this parameter defines the vectors that are in the core and the other ones
+# values that differs from less than this parameters are in the core
+CORE_PARAM = 10
+
+# this parameter is an epsilon add to the standard deviations to avoid the problem
+# of a zero standard deviation
+EPSILON = 10**(-6)

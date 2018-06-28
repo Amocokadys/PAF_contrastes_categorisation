@@ -1,4 +1,4 @@
-from tkinter import*
+from tkinter import *
 from PIL import Image, ImageTk
 import main
 import numpy as np
@@ -10,15 +10,20 @@ import contrasteur
 
 
 def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
+ """fonction pour enregistrer l'image du cluster de l'objet gmm projetés sur les dimensions colonne1 et colonne2 ainsi que le point. Le graphique est enregistré sur graphique.png"""
  #Visualisation des clusters formés par gmm
  data, centers=gmm.result()
  colorlist= list(matplotlib.colors.cnames.keys())
  random.shuffle(colorlist)
  colorpoints=[]
+ labels=[]
  for p in data.itertuples():
+  #print(type(p))
+  #print(p)
   colorpoints.append(colorlist[p[-1]])
+  #labels.append(p.index[0])
  plt.plot(point[0],point[1],"b:*",markersize=20)
- plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k')
+ plt.scatter(data[colonne1],data[colonne2],c=colorpoints,edgecolor='k',label=labels)
  plt.title('Classification gmm ')
  plt.xlabel(colonne1)
  plt.ylabel(colonne2)
@@ -26,9 +31,10 @@ def graphic_clusters_fruits(gmm,colonne1,colonne2,point):
  plt.clf()
  
 class Frame_principal (Frame):
+ """classe qui permet de construire notre interface graphique"""
  
  def __init__(self,listelabels,mclusters,listeContrastes,mgmm):
-  Frame.__init__(self, borderwidth = 50, bg='red')
+  Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
   self.mclusters=mclusters
   self.listeContrastes=listeContrastes
  
@@ -78,6 +84,7 @@ class Frame_principal (Frame):
   image = Image.open("graphique.png") 
   self.photo = ImageTk.PhotoImage(image)
   espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  print(image.size)
   espace_image.grid(row=1, column=0,rowspan=10)
   espace_image.create_image(323, 242, image =self.photo)
   
@@ -89,6 +96,7 @@ class Frame_principal (Frame):
   self.buttonGraph.grid(row=0,column=0)
   
  def tracerGraph(self):
+  """appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
   index=[int(self.var_choix.get()[-1]),int(self.var_choix1.get()[-1])]
   point=np.array([float(self.attributs[k].get()) for k in index])
   graphic_clusters_fruits(self.mgmm,str(self.var_choix.get()[:-1]), str(self.var_choix1.get()[:-1]), point)
@@ -102,8 +110,10 @@ class Frame_principal (Frame):
   print(self.var_choix.get(),"coucou")
 
  def fonctionTest(self):
+  """fonction qui donne la categorie d'un point et ses caractéristiques"""
   data=np.array([float(attribut.get()) for attribut in self.attributs])
   resultat=contrasteur.result(self.mclusters, self.listeContrastes, data)
+  print(resultat)
   champ=Label(self, text="cluster : "+resultat[0][0])
   champ.grid(row=13, column=0)
   champ1=Label(self, text="caractéristiques : "+str(resultat[1]))
@@ -121,3 +131,66 @@ class Application(Frame):
 """
 appli = Application(["rouge","bleu","vert"]) 
 appli.mainloop()"""
+
+
+class FrameIncrementale(Frame):
+ """pour l'interface graphique de la methode incremnetale"""
+ 
+ def __init__(self,listeOptions):
+  Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
+  for k in range(10):
+   v = StringVar()
+   v.set(listeOptions[0])
+   om = OptionMenu(self, v, *listeOptions)
+   om.grid(row=k, column=1)
+   
+   
+  image = Image.open("graphique.png") #TODO remplacer par la bonne image initiale
+  self.photo = ImageTk.PhotoImage(image)
+  espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  espace_image.grid(row=0, column=0,rowspan=10)
+  espace_image.create_image(323, 242, image =self.photo)
+  self.attributs=[]
+  for k in range(10):
+   var_texte = StringVar()
+   ligne_texte = Entry(self, textvariable=var_texte, width=30)
+   self.attributs.append(var_texte)
+   ligne_texte.grid(row=k,column=2)
+   
+  self.buttonInsert=Button(self, text="resultat", command= self.fonctionInsertion)
+  self.buttonNom=Button(self, text="resultat", command= self.fonctionNom)
+  
+  
+  arborescence.Arbre.distribution = [None, None, None]#TODO Louis initialiser
+  self.monArbre = arborescence.Arbre([])
+  
+  
+  champ_label = Label(self, text="donnez le nom de votre objet : ")
+  champ_label.grid(row=11,column=0)
+  var_texte = StringVar()
+  ligne_texte = Entry(self, textvariable=var_texte, width=30)
+  ligne_texte.grid(row=11,column=1)
+ 
+ 
+ 
+ def fonctionInsertion(self):
+  test += Feuille(self.attributs)#TODO Louis inserer l objet
+  
+ def fonctionNom(self):
+  #TODO Louis donner le nom à l objet
+  pass
+  
+ def retracerGraph(self):
+  """appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
+  #TODO recreer l image puis la remplacer dans ce qu on affiche
+  image = Image.open("graphique.png") 
+  self.photo = ImageTk.PhotoImage(image)
+  espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+  espace_image.grid(row=1, column=0,rowspan=10)
+  espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
+  
+class ApplicationInterface(Frame):
+ def __init__(self,listelabels):
+  Frame.__init__(self)
+  partie_principale =  FrameIncrementale(listelabels)
+  partie_principale.grid()

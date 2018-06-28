@@ -19,14 +19,13 @@ import clusterisation
 
 from constantes import *
 
-
 class Contraste:
-    
+
     def __init__(self,clustersList,critere=0.2,numberCluster=3):
         self.clustersList=clustersList
         self.critere=critere
         self.numberCluster=numberCluster
-        
+
     def difference(self,cluster):
         """ return the difference between a dataframe and its center """
         dataframe = cluster.getDataFrame()
@@ -34,46 +33,42 @@ class Contraste:
         center = cluster.getCenter()
         diff = (dataframe-center[:len(dataframe.columns)])/self.variance(dataframe)
         return diff
-             
+
 
     def variance(self,dataFrame):
         return dataFrame.var(axis=0)
-    
+
 
     def sharpening(self, point):
         """
         only selects values from point that are smaller than p
         """
         return point.mask(abs(point) < SHARPEN_PARAM, other = 0)
-        
-    #def sharpening(self,diff):
-    #    """ sharps the dataframe in function a critere"""
-    #    
-    #    maxiListe = diff.max(axis=0)
-    #    
-    #    for k in diff.iterrows():
-    #        for j in range(len(k[1])):
-    #            if(abs(k[1][j])<self.critere*maxiListe[j]):
-    #                k[1][j]=0  
-    #            
-    #    return diff
-    
+
+
+    def sharpening(self, point):
+        """
+        only selects values from point that are smaller than p
+        """
+        return point.mask(abs(point) < SHARPEN_PARAM, other = 0)
+
+
     def putZeros(self,dataframe,i):
         result=dataframe.copy(deep=True)
-        
+
         for k in result.iterrows():
             for j in range(len(k[1])):
                 if(j!=i):
                     k[1][j]=0
         return result
-        
+
     def mini(self,dataframe,k):
         minListe=dataframe.min(axis=0)
         minimum =minListe[k]
-        
+
         for j in dataframe.iterrows():
             j[1][k]+=abs(minimum)
-            
+
         return dataframe,minimum
 
     def soustractMin(self,dataframe,minimum,k):
@@ -84,7 +79,7 @@ class Contraste:
         toReturn=self.putZeros(result,k)
         toReturn['category']=categories
         return toReturn
-        
+
     def contrast(self):
         """ reapply gmm on each sharpens cluster """
 
@@ -94,25 +89,25 @@ class Contraste:
             diff = self.difference(cluster)
             sharp = self.sharpening(diff)
             newListDatas.append(sharp)
-            
-        newDataFrame=pd.concat(newListDatas) 
-        
+
+        newDataFrame=pd.concat(newListDatas)
+
         gmmList = []
-    
-        for k in range(len(newDataFrame.columns)):    
+
+        for k in range(len(newDataFrame.columns)):
             zeroDatas = self.putZeros(newDataFrame,k)
             miniFrame,minimum=self.mini(zeroDatas,k)
+            print(miniFrame)
             newGmm = gmm.GMM(miniFrame,self.numberCluster)
             dataFrame, centers = newGmm.result()
             lastDataFrame=self.soustractMin(dataFrame,minimum,k)
             clusterObject = clusterisation.Clusterisation(lastDataFrame,centers, isContrast = True, dimension = lastDataFrame.columns[k])
             listeClusters = clusterObject.result()
             gmmList.append(listeClusters)
-        
+
         return gmmList
-            
-            
+
+
     def result(self):
         """ return the dataframe centré réduit sharpené """
         return self.contrast()
-        

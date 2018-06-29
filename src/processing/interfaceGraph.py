@@ -218,21 +218,31 @@ class FrameIncrementale(Frame):
 	# fonctions des boutons
 	
 	def fonctionInsertion(self):
+		
+		""" ajout d'un animal """
+		
 		liste = {};
-		self.listeChamps = ["taille (cm)", "régime alimentaire"] + [champ.get() for champ in self.listeChamps]
-		print(self.listeChamps, [self.attributs[k].get() for k in range(len(self.attributs))])
-		for i in range(len(self.listeChamps)):
-			if len(self.attributs[i].get()) > 0:
-				if type(Ensemble.distribution[self.listeChamps[i]]) == list:
-					liste[self.listeChamps[i]] = Ensemble.distribution[self.listeChamps[i]].index(str(self.attributs[i].get()))
+		listeChamps = ["taille (cm)", "régime alimentaire"] + self.listeChamps
+		
+		print("----  " , [ el.get() for el in self.attributs])
+		
+		for i in range(len(listeChamps)):
+			
+			champ = listeChamps[i]
+			attribut = self.attributs[i].get()
+			if type(champ) != str:
+				champ = champ.get()
+
+			if len(attribut) > 0:
+				if type(Ensemble.distribution[champ]) == list:
+					liste[champ] = Ensemble.distribution[champ].index(str(attribut))
 				else:
-					if len(self.attributs[i].get()) > 0:
-						liste[self.listeChamps[i]] = float(self.attributs[i].get())
+					if len(attribut) > 0:
+						liste[champ] = float(attribut)
+						
 		feuil = Feuille(liste, self.var_nom.get())
-		feuil.commentaire = True
-		print(feuil.centre)
+		feuil.cherche_contraste = True
 		self.monArbre += feuil
-		print(Feuille.commentaire)
 		champ_label = Label(self, text=Feuille.commentaire)
 		champ_label.grid(row=13,column=3)
 		self.retracerGraph()

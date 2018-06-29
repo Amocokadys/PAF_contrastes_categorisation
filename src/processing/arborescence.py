@@ -83,7 +83,7 @@ class Feuille(Ensemble):
 				
 		contraste = sharpening(self,max_dimension)
 		
-		commentaire = feuil[max_contraste].titre
+		commentaire = feuil[max_contraste].titre + " "
 		if Ensemble.mauvais[contraste[0]] == "à":
 			commentaire += " à " + self[contraste[0]] + " " + contraste[0]
 		elif contraste[2] * 3 > contraste[1]:
@@ -92,9 +92,7 @@ class Feuille(Ensemble):
 			commentaire += Ensemble.bon[contraste[0]]
 		else:
 			commentaire += Ensemble.mauvais[contraste[0]]
-		Feuille.commentaire = commentaire
-		print(commentaire + " kuyvjhgcjhgc")
-			
+		Feuille.commentaire = commentaire			
 		
 
 class Arbre(Ensemble):
@@ -153,7 +151,7 @@ class Arbre(Ensemble):
 			self.enfants.append(livre)
 			
 			if livre.cherche_contraste:
-				livre.recherche_contraste(self._private_liste_points())
+				livre.recherche_contraste(self._private_liste_points(True))
 								
 			#self.regroupement()
 		
@@ -179,16 +177,19 @@ class Arbre(Ensemble):
 		#random = np.random.random(len(enfants[0]),len(enfants[0]))
 		#self.matriceCov += pd.DataFrame(random * 10e-6)
 		
-	def _private_liste_points(self):
+	def _private_liste_points(self, renvoi_feuilles=False):
 		
 		""" recherche récursive des descendants """
 		
 		points = []
 		for el in self.enfants:
 			if el.feuille():
-				points.append(el.centre)
+				if renvoi_feuilles:
+					points.append(el)
+				else:
+					points.append(el.centre)
 			else:
-				points += el._private_liste_points()
+				points += el._private_liste_points(renvoi_feuilles)
 		return points
 		
 	def regroupement(self):
@@ -286,7 +287,6 @@ def lire_csv():
 					elif "/" in ligne[i+1]:
 						Ensemble.distribution[predistribution[i]] = ligne[i+1].split("/")
 					else:
-						print("-",ligne[i],"-")
 						Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
 			elif ligne[0] == "mauvais":
 				for i in range(len(predistribution)):
@@ -301,7 +301,6 @@ def lire_csv():
 						Ensemble.obligatoire[i] = True
 					else:
 						Ensemble.obligatoire[i] = False
-				print(Ensemble.obligatoire)
 			else:
 				dico = {}
 				for i in range(1, len(ligne)):

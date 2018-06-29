@@ -8,7 +8,7 @@ Created on Tue Jun 19 10:57:46 2018
 
 import math
 import numpy as np
-from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Transfini
+from ensemble import Ensemble, Transfini
 import subprocess
 import csv
 from random import randint
@@ -42,6 +42,7 @@ class Feuille(Ensemble):
 		self.nombre_descendant = 1
 		self.titre = titre
 		self.centre = point
+		self.complex = 0
 		for el in point:
 			if Ensemble.distribution[el] == None:
 				if point[el] > 0:
@@ -64,6 +65,10 @@ class Feuille(Ensemble):
 		return self.titre
 	
 	def recherche_contraste(self,feuil):
+		
+		""" recherche une donnée dans le même cluster se rapporchant le plus de la donnée à ajouter
+		une opération de sharpening cherche quelle dimension les distingue le plus """
+		
 		def sharpening(selfie, elt):
 			contraste_max = 0
 			contraste_max_second = 0
@@ -110,7 +115,7 @@ class Arbre(Ensemble):
 				
 				self[el] = enfants[0][el]
 				
-				
+				""" calcul du barycentre """
 				poids_total = 0
 				for enf in enfants[1:]:
 					if (not el in enf.centre) or \
@@ -162,6 +167,7 @@ class Arbre(Ensemble):
 			if el in livre:
 				self[el] = (self.nombre_descendant * self[el] + livre[el])/(self.nombre_descendant + 1)
 		
+		""" calcul de la distance maximale séparant deux enfants """
 		self.variance = Transfini()
 		for i in range(len(self.enfants)):
 			for j in range(i+1,len(self.enfants)):
@@ -193,12 +199,8 @@ class Arbre(Ensemble):
 		return points
 		
 	def regroupement(self):
-		"""méthode visant à regrouper si besoin les enfants d'un noeud,
+		"""méthode inachevée visant à regrouper si besoin les enfants d'un noeud,
 		pour les regrouper dans un cluster fils """
-		
-		
-		
-		
 		
 		def banane(el):
 			for cat in sous_groupes:
@@ -237,6 +239,7 @@ class Arbre(Ensemble):
 		return chaine + " ]"
 	
 	def dessin(self, chemin=""):
+		""" dessine l'arbre """
 		texte = ""
 		if chemin == "" or chemin == "*":
 			texte += "digraph G { " + self.dessin("~") + "}"

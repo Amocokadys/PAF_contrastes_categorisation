@@ -35,7 +35,7 @@ class Feuille(Ensemble):
 	
 	""" classe correspondant à une donnée"""
 	
-	commentaire = 0
+	commentaire = ""
 		
 	def __init__(self, point, titre = ""):
 		self.cherche_contraste = False
@@ -93,6 +93,7 @@ class Feuille(Ensemble):
 		else:
 			commentaire += Ensemble.mauvais[contraste[0]]
 		Feuille.commentaire = commentaire
+		print(commentaire + " kuyvjhgcjhgc")
 			
 		
 
@@ -266,6 +267,8 @@ class Arbre(Ensemble):
 		
 
 def lire_csv():
+	
+	
 	racine = Arbre([], "~")
 	feuilles = []
 	predistribution = []
@@ -292,7 +295,13 @@ def lire_csv():
 				for i in range(len(predistribution)):
 					Ensemble.bon[predistribution[i]] = ligne[i+1]
 			elif ligne[0] == "obligatoire":
-					Ensemble.obligatoire = ligne[1:]
+				Ensemble.obligatoire = ligne[1:]
+				for i in range(len(Ensemble.obligatoire)):
+					if Ensemble.obligatoire[i] == "*":
+						Ensemble.obligatoire[i] = True
+					else:
+						Ensemble.obligatoire[i] = False
+				print(Ensemble.obligatoire)
 			else:
 				dico = {}
 				for i in range(1, len(ligne)):

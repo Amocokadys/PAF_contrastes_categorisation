@@ -141,9 +141,9 @@ class FrameIncrementale(Frame):
 		
 		racine = Arbre([], "~")
 		feuilles = []
-		predistribution = []
+		self.predistribution = []
 		
-		self.monArbre, predistribution = lire_csv()
+		self.monArbre, self.predistribution = lire_csv()
 
 		
 		Frame.__init__(self, borderwidth = 50, bg='darkslateblue')
@@ -153,46 +153,50 @@ class FrameIncrementale(Frame):
 		#liste des champs
 		boolList=Ensemble.obligatoire
 		nombreObligatoires=0
-		ligneCourante=11
+		ligneCourante=12
 		listeNonObligatoires=[]
+
 		self.attributs=[]
 		for k in range(len(boolList)):
 			if boolList[k]:
 				v = StringVar()
-				v.set(predistribution[k])
-				champ_label = Label(self, text=predistribution[k])
-				champ_label.grid(row=LigneCourante,column=0)
-				ligneCourante+=1
-				if "/" in Ensemble.distribution[k]:
-					om = OptionMenu(self, v,Ensemble.distribution[k] )
-					self.attributs.append(om)
-					om.grid(row=LigneCourante, column=2)
+				v.set(self.predistribution[k])
+				champ_label = Label(self, text=self.predistribution[k])
+				champ_label.grid(row=ligneCourante,column=1)
+				if  type(Ensemble.distribution[self.predistribution[k]]) == list:
+					var_choix=StringVar()
+					om = OptionMenu(self,var_choix,*Ensemble.distribution[self.predistribution[k]] )
+					self.attributs.append(var_choix)
+					om.grid(row=ligneCourante, column=2)
 				else:
+					var_texte=StringVar()
 					ligne_texte = Entry(self, textvariable=var_texte, width=30)
 					self.attributs.append(var_texte)
-					ligne_texte.grid(row=LigneCourante,column=2)
+					ligne_texte.grid(row=ligneCourante,column=2)
+				ligneCourante+=1
 			else:
-				listeNonObligatoire.append(predistribution[k])
+				listeNonObligatoires.append(self.predistribution[k])
 		
-		
+		self.listeChamps=[]
 		for k in range(4):
 			v = StringVar()
 			v.set(listeNonObligatoires[0])
-			om = OptionMenu(self, v, *listeNonObligatoire)
-			om.grid(row=k+LigneCourante, column=1)
+			om = OptionMenu(self, v, *listeNonObligatoires)
+			self.listeChamps.append(v)
+			om.grid(row=k+ligneCourante, column=1)
 			var_texte = StringVar()
 			ligne_texte = Entry(self, textvariable=var_texte, width=30)
 			self.attributs.append(var_texte)
-			ligne_texte.grid(row=k+LigneCourante,column=2)
+			ligne_texte.grid(row=k+ligneCourante,column=2)
 			
 			
 			
 		#image initiale
 		image = Image.open("/tmp/graphviz.png")
 		self.photo = ImageTk.PhotoImage(image)
-		espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
-		espace_image.grid(row=0, column=0, columnspan=10)
-		espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
+		self.espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+		self.espace_image.grid(row=0, column=0, columnspan=10)
+		self.espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
 			
 			
 		self.buttonInsert=Button(self, text="resultat", command= self.fonctionInsertion)
@@ -205,36 +209,45 @@ class FrameIncrementale(Frame):
 		
 		champ_label = Label(self, text="donnez le nom de votre objet : ")
 		champ_label.grid(row=11,column=0)
-		var_texte = StringVar()
-		ligne_texte = Entry(self, textvariable=var_texte, width=30)
+		self.var_nom = StringVar()
+		ligne_texte = Entry(self, textvariable=self.var_nom, width=30)
 		ligne_texte.grid(row=11,column=1)
+		self.retracerGraph()
 	
 	
 	# fonctions des boutons
 	
 	def fonctionInsertion(self):
-		alea = "votre animal"
-		self.monArbre += Feuille(self.attributs, alea)
+		liste = {};
+		self.listeChamps = ["taille (cm)", "régime alimentaire"] + [champ.get() for champ in self.listeChamps]
+		print(self.listeChamps, [self.attributs[k].get() for k in range(len(self.attributs))])
+		for i in range(len(self.listeChamps)):
+			if len(self.attributs[i].get()) > 0:
+				if type(Ensemble.distribution[self.listeChamps[i]]) == list:
+					liste[self.listeChamps[i]] = Ensemble.distribution[self.listeChamps[i]].index(str(self.attributs[i].get()))
+				else:
+					if len(self.attributs[i].get()) > 0:
+						liste[self.listeChamps[i]] = float(self.attributs[i].get())
+		feuil = Feuille(liste, self.var_nom.get())
+		feuil.commentaire = True
+		print(feuil.centre)
+		self.monArbre += feuil
+		print(Feuille.commentaire)
+		champ_label = Label(self, text=Feuille.commentaire)
+		champ_label.grid(row=13,column=3)
 		self.retracerGraph()
 		
 	def fonctionNom(self):
-		nom = input("votre animal est un ...")
-		liste = self.monArbre._private_liste_points()
-		for feuil in liste:
-			if feuil.titre == "votre animal":
-				feuil.titre = nom
-				self.retracerGraphph()
-				return
-		print("animal non trouvé")
+		pass
 		
 	def retracerGraph(self):
 		"""appelle la fonction qui enregistre l'image (en fonction des colonnes cochées et le trace"""
-		racine.dessin("*")
+		self.monArbre.dessin("*")
 		image = Image.open("/tmp/graphviz.png") 
 		self.photo = ImageTk.PhotoImage(image)
-		espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
-		espace_image.grid(row=1, column=0,rowspan=10)
-		espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
+		self.espace_image = Canvas(self, width = image.size[0], height = image.size[1], bg ='blue')
+		self.espace_image.grid(row=0, column=0, columnspan=10)
+		self.espace_image.create_image(image.size[0]/2, image.size[1]/2, image =self.photo)
 		
 class ApplicationInterface(Frame):
 	def __init__(self):

@@ -19,6 +19,11 @@ _RAPPORT_LOG = 1
 
 class Transfini:
 	
+	""" classe gérant les distances infinies un peu comme des ordinaux transfinis : 
+		- un écart sur des dimensions réelle (par exemple la taille) affecte la composante n.
+		- un écart sur une dimension discrète (par exemple le nombre de pattes) affecte la composante w.
+		- une dimension non partagée entre les deux données affecte la composante w2, ici appelée z. """
+	
 	def __init__(self, n = 0, w = 0, z = 0):
 		self.n = n
 		self.w = int(w)
@@ -87,18 +92,24 @@ class Transfini:
 			return str(self.n) + " + " + str(self.w) + "w + " + str(self.z) + "w2"
 		else:
 			return "- " + str(self.n) + " + " + str(self.w) + "w + " + str(self.z) + "w2"
-	
-	"""def __sub__(self, autre):
-		if self.z < autre.z:
-			raise ArithmeticError
-		elif self.n < autre.n:
-			return Transfini(0,self.w - autre.w)
-		else:
-			return Transfini(self.n - autre.n, self.w - autre.w)"""
-
 
 
 class Ensemble:
+	
+	""" classe mère de Feuille et Arbre.
+	Contient également des variables statiques servant à décrire les caractéristiques spécifiques au données :
+		soit d une dimension :
+			- distribution[d] = None si cette dimension est continue et est pertinente en échelle log.
+			- distribution[d] = x 	  si cette dimension est continue et a x comme valeur maximale estimée.
+			- distribution[d] = 0    si cette dimension est discrète et prend une valeur dans N.
+			- distribution[d] est une liste si cette dimension est discrète, et prend une valeur parmi les éléments 
+				de la liste
+			
+			- bon[d] donne l'adjectif correspondant à une valeur élevée de d
+			- mauvais[d] donne l'adjectif correspondant à une valeur faible de d.
+			- obligatoire[d] est vrai si cette dimension a toujours un sens.
+		
+		 """
 	
 	distribution = {}
 	mauvais = {}

@@ -11,7 +11,7 @@ Description du fichier …… : Cartouche
 
 import math
 import numpy as np
-from ensemble import Ensemble, _CONSTANTE, _SEUIL_NOUVEAU_CLUSTER, _RAPPORT_LOG, Transfini
+from ensemble import Ensemble, Transfini
 import subprocess
 import csv
 from random import randint
@@ -38,13 +38,14 @@ class Feuille(Ensemble):
 	
 	""" classe correspondant à une donnée"""
 	
-	commentaire = 0
+	commentaire = ""
 		
 	def __init__(self, point, titre = ""):
 		self.cherche_contraste = False
 		self.nombre_descendant = 1
 		self.titre = titre
 		self.centre = point
+		self.complex = 0
 		for el in point:
 			if Ensemble.distribution[el] == None:
 				if point[el] > 0:
@@ -67,6 +68,10 @@ class Feuille(Ensemble):
 		return self.titre
 	
 	def recherche_contraste(self,feuil):
+		
+		""" recherche une donnée dans le même cluster se rapporchant le plus de la donnée à ajouter
+		une opération de sharpening cherche quelle dimension les distingue le plus """
+		
 		def sharpening(selfie, elt):
 			contraste_max = 0
 			contraste_max_second = 0
@@ -86,7 +91,7 @@ class Feuille(Ensemble):
 				
 		contraste = sharpening(self,max_dimension)
 		
-		commentaire = feuil[max_contraste].titre
+		commentaire = feuil[max_contraste].titre + " "
 		if Ensemble.mauvais[contraste[0]] == "à":
 			commentaire += " à " + self[contraste[0]] + " " + contraste[0]
 		elif contraste[2] * 3 > contraste[1]:
@@ -95,8 +100,7 @@ class Feuille(Ensemble):
 			commentaire += Ensemble.bon[contraste[0]]
 		else:
 			commentaire += Ensemble.mauvais[contraste[0]]
-		Feuille.commentaire = commentaire
-			
+		Feuille.commentaire = commentaire			
 		
 
 class Arbre(Ensemble):
@@ -114,7 +118,7 @@ class Arbre(Ensemble):
 				
 				self[el] = enfants[0][el]
 				
-				
+				""" calcul du barycentre """
 				poids_total = 0
 				for enf in enfants[1:]:
 					if (not el in enf.centre) or \
@@ -155,7 +159,7 @@ class Arbre(Ensemble):
 			self.enfants.append(livre)
 			
 			if livre.cherche_contraste:
-				livre.recherche_contraste(self._private_liste_points())
+				livre.recherche_contraste(self._private_liste_points(True))
 								
 			#self.regroupement()
 		
@@ -166,6 +170,7 @@ class Arbre(Ensemble):
 			if el in livre:
 				self[el] = (self.nombre_descendant * self[el] + livre[el])/(self.nombre_descendant + 1)
 		
+		""" calcul de la distance maximale séparant deux enfants """
 		self.variance = Transfini()
 		for i in range(len(self.enfants)):
 			for j in range(i+1,len(self.enfants)):
@@ -181,25 +186,24 @@ class Arbre(Ensemble):
 		#random = np.random.random(len(enfants[0]),len(enfants[0]))
 		#self.matriceCov += pd.DataFrame(random * 10e-6)
 		
-	def _private_liste_points(self):
+	def _private_liste_points(self, renvoi_feuilles=False):
 		
 		""" recherche récursive des descendants """
 		
 		points = []
 		for el in self.enfants:
 			if el.feuille():
-				points.append(el.centre)
+				if renvoi_feuilles:
+					points.append(el)
+				else:
+					points.append(el.centre)
 			else:
-				points += el._private_liste_points()
+				points += el._private_liste_points(renvoi_feuilles)
 		return points
 		
 	def regroupement(self):
-		"""méthode visant à regrouper si besoin les enfants d'un noeud,
+		"""méthode inachevée visant à regrouper si besoin les enfants d'un noeud,
 		pour les regrouper dans un cluster fils """
-		
-		
-		
-		
 		
 		def banane(el):
 			for cat in sous_groupes:
@@ -238,6 +242,7 @@ class Arbre(Ensemble):
 		return chaine + " ]"
 	
 	def dessin(self, chemin=""):
+		""" dessine l'arbre """
 		texte = ""
 		if chemin == "" or chemin == "*":
 			texte += "digraph G { " + self.dessin("~") + "}"
@@ -269,6 +274,8 @@ class Arbre(Ensemble):
 		
 
 def lire_csv():
+	
+	
 	racine = Arbre([], "~")
 	feuilles = []
 	predistribution = []
@@ -286,7 +293,6 @@ def lire_csv():
 					elif "/" in ligne[i+1]:
 						Ensemble.distribution[predistribution[i]] = ligne[i+1].split("/")
 					else:
-						print("-",ligne[i],"-")
 						Ensemble.distribution[predistribution[i]] = float(ligne[i+1])
 			elif ligne[0] == "mauvais":
 				for i in range(len(predistribution)):
@@ -295,7 +301,12 @@ def lire_csv():
 				for i in range(len(predistribution)):
 					Ensemble.bon[predistribution[i]] = ligne[i+1]
 			elif ligne[0] == "obligatoire":
-					Ensemble.obligatoire = ligne[1:]
+				Ensemble.obligatoire = ligne[1:]
+				for i in range(len(Ensemble.obligatoire)):
+					if Ensemble.obligatoire[i] == "*":
+						Ensemble.obligatoire[i] = True
+					else:
+						Ensemble.obligatoire[i] = False
 			else:
 				dico = {}
 				for i in range(1, len(ligne)):

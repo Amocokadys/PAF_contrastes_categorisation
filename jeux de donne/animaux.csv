@@ -1,0 +1,27 @@
+critère,taille (cm),pattes,vitesse de marche (m/s),vitesse de vol (m/s),vitesse de nage (m/s),régime alimentaire,durée de vie (années)
+obligatoire,*,,,,,*,*
+mode,none,0,none,none,none,végétarien/insectivore/omnivore/carnivore,none
+mauvais,petit,à,lent,lent,mauvais nageur,,éphémère
+bon,grand,à,rapide,rapide,bon nageur,,à grande longévité
+humain,180,4,2,,,2,80
+fourmi,0.2,6,0.02,,,2,0.1
+thon,10,,,,0.5,0,20
+rouge-gorge,5,2,0.1,5,,1,10
+vache,200,4,1,,,0,50
+guêpe,1,6,0.01,2,,1,0.1
+araignée,2,8,0.05,,,1,2
+crapaud,10,4,0.05,,0.1,1,4
+escargot,3,,0.001,,,0,6
+crocodile,3,4,0.3,,3,3,70
+pigeon,10,2,0.1,10,,1,6
+méduse,10,,,,1,0,0.5
+lapin,20,4,3,,,0,8
+limace,5,,0.001,,,0,4
+puceron,0.001,6,0.001,,,0,0.05
+huître,5,,,,,0,20
+tortue,20,4,0.05,,,0,100
+vipère,20,,1,,,3,15
+hamster,5,4,0.3,,,0,2
+chenille,2,,0.004,,,0,0.2
+éléphant,5,4,5,,,0,60
+lézard,15,4,0.5,,,1,10
